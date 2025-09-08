@@ -1,6 +1,6 @@
 [build]
   command = "npm run build -- --configuration production"
-  publish = "dist/equitel-register-forms/browser"
+  publish = "dist/equitel-register-form/browser"
 
 [build.environment]
   NODE_VERSION = "18"
