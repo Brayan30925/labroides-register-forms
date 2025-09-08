@@ -2,5 +2,5 @@
   command = "npm run build --configuration=production"
   publish = "dist/labroides-register-form"
 
-[context.production]
-  command = "npm run build --configuration=production"
+[[plugins]]
+  package = ""
