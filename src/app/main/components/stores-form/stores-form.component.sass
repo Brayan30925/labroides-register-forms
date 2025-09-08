@@ -1,0 +1,56 @@
+.stores-form-container
+  display: flex
+  flex-direction: column
+  gap: 24px // Espacio vertical entre secciones
+
+  .select-all-stores-container
+    padding: 15px 20px
+    border-radius: 8px
+    background-color: #f9f9f9 // Fondo ligeramente diferente
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) // Sombra sutil
+
+    mat-checkbox
+      font-weight: bold // Hacer el texto de seleccionar todo más prominente
+
+  .stores-list-grid
+    display: grid
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) // Columnas flexibles
+    gap: 16px // Espacio entre checkboxes
+    padding: 20px
+    border-radius: 8px
+    background-color: #f9f9f9 // Fondo similar al de "seleccionar todo"
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) // Sombra sutil
+
+    // Estilos para los checkboxes de Material para asegurar alineación
+    mat-checkbox
+      display: flex
+      align-items: center // Alinea el texto con el checkbox
+      padding: 8px 0 // Espacio interno para cada checkbox
+      .mat-mdc-checkbox-inner-container
+        margin-right: 8px // Espacio entre el checkbox y el texto
+
+  // Media queries para ajustar el número de columnas en pantallas más pequeñas
+  @media screen and (max-width: 768px)
+    .stores-list-grid
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr))
+      gap: 12px
+    .select-all-stores-container
+      padding: 12px 15px
+
+  @media screen and (max-width: 480px)
+    .stores-list-grid
+      grid-template-columns: 1fr // Una columna en móviles
+      gap: 10px
+    .select-all-stores-container
+      padding: 10px 12px
+
+.no-stores-message
+  padding: 20px
+  border-radius: 8px
+  background-color: #fff3e0 // Un color de fondo suave para mensajes
+  border: 1px solid #ffcc80
+  color: #e65100
+  text-align: center
+  h1
+    font-size: 1.2em
+    margin: 0

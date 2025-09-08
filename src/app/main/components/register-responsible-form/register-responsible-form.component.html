@@ -1,0 +1,27 @@
+<form [formGroup]="registerResponsibleForm()">
+  <mat-form-field>
+    <mat-label>Nombres</mat-label>
+    <mat-hint>Ingresa el nombre de la persona que diligencia el formulario</mat-hint>
+    <input formControlName="name" matInput />
+    <mat-error *ngIf="formControls().name.errors?.['required']">El nombre es un campo obligatorio</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Email</mat-label>
+    <mat-hint>Ingresa el email de la persona que diligencia el formulario</mat-hint>
+    <input formControlName="email" matInput />
+    @if (formControls().email.errors?.["required"]) {
+      <mat-error>El email es un campo obligatorio</mat-error>
+    } @else if (formControls().email.errors?.["email"]) {
+      <mat-error>El email no tiene un formato valido</mat-error>
+    } @else if (formControls().email.errors?.["invalidDomain"]) {
+      <mat-error>El email no pertenece al dominio corporativo</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Observaciones</mat-label>
+    <mat-hint>Ingresa las observaciones sobre está solicitud</mat-hint>
+    <textarea formControlName="observations" matInput></textarea>
+  </mat-form-field>
+</form>

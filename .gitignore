@@ -1,0 +1,10 @@
+# dependencias
+/node_modules
+
+# compilados
+/dist
+
+# cache y logs
+.angular/cache
+.eslintcache
+npm-debug.log

@@ -1,0 +1,75 @@
+.main-container
+  display: flex
+  flex-direction: column
+  min-height: 100vh
+  background-color: #f0f2f5 /* Un gris muy suave para un fondo más limpio */
+  padding: 30px /* Aumento del padding general para más espacio */
+  box-sizing: border-box
+  gap: 40px /* Mayor espacio entre elementos principales */
+
+mat-toolbar
+  background-color: #2C3E50 /* Un gris antracita oscuro para un look sofisticado */
+  color: white
+  display: flex
+  justify-content: flex-start /* Alinea el logo y el texto al inicio */
+  align-items: center
+  padding: 18px 36px /* Más padding para una apariencia más espaciosa */
+  border-radius: 12px /* Bordes más redondeados */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15) /* Sombra más definida */
+
+mat-toolbar img
+  height: 56px /* Imagen ligeramente más grande para mayor impacto */
+
+mat-toolbar span
+  font-size: 26px /* Tamaño de fuente ligeramente más grande para el título */
+  font-weight: 700 /* Negrita más fuerte */
+  margin-left: 28px
+  letter-spacing: 0.8px /* Ligero espaciado entre letras */
+
+.mat-tab-group
+  background-color: white
+  border-radius: 16px /* Mayor redondeo para un aspecto más suave */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09) /* Sombra más suave y extendida */
+  padding: 36px /* Mayor padding interno */
+  flex-grow: 1
+  overflow: hidden
+
+.mat-tab
+  padding: 30px /* Mayor padding dentro de la pestaña */
+  background-color: #ffffff /* Fondo blanco puro para el contenido */
+  border-radius: 10px /* Bordes ligeramente más redondeados */
+  border: 1px solid #e5e5e5 /* Un borde sutil más claro */
+  margin-top: 20px /* Más espacio superior para separar del encabezado de la pestaña */
+
+.actions-container
+  display: flex
+  justify-content: center /* ¡Esto centra el botón! */
+  margin-top: 12px /* Más espacio superior antes de los botones */
+  gap: 20px /* Más espacio entre los botones si hay varios */
+
+button[mat-flat-button]
+  font-weight: 600
+  padding: 14px 32px /* Aumento del padding para botones más "rellenos" */
+  border-radius: 15px /* Bordes ligeramente más redondeados */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease /* Añadir transform para un efecto de clic */
+  text-transform: uppercase /* Texto en mayúsculas */
+  letter-spacing: 1px /* Mayor espaciado entre letras */
+  cursor: pointer /* Asegura que el cursor sea de puntero */
+
+button[mat-flat-button]:hover:not([disabled])
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) /* Sombra más marcada en hover */
+  transform: translateY(-3px) /* Pequeño levantamiento en hover */
+
+button[mat-flat-button][color='primary']
+  background-color: #eb3d74ff /* Color primario */
+  color: white
+
+button[mat-flat-button][color='primary']:hover:not([disabled])
+  background-color: #e26ad6ff /* Un tono ligeramente más oscuro en hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) /* Sombra más fuerte para el primario en hover */
+
+button[mat-flat-button][disabled]
+  opacity: 0.5 /* Menor opacidad para indicar que está deshabilitado */
+  cursor: not-allowed
+  box-shadow: none
+  transform: none /* Sin efecto de levantamiento */

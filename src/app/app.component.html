@@ -1,0 +1,58 @@
+<div class="main-container">
+  <mat-toolbar>
+    <img ngSrc="assets/equitel-logo.png" width="302" height="48" priority alt="logo equitel" />
+    <span>Solicitud de Usuario en Labroides</span>
+  </mat-toolbar>
+  <div class="mat-tab-group">
+    <mat-tab-group [selectedIndex]="currentFormIndex()" mat-align-tabs="start" mat-stretch-tabs="false">
+      <mat-tab label="Datos Básicos" [disabled]="!tabsStatus[0]">
+        <div class="mat-tab">
+          <app-basic-data-form (technicianStatusChanged)="onTechnicianStatusChange($event)"></app-basic-data-form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Datos Específicos" [disabled]="!tabsStatus[1]">
+        <div class="mat-tab">
+          <app-specific-data-form></app-specific-data-form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Centros de Costo" [disabled]="!tabsStatus[2]">
+        <div class="mat-tab">
+          <app-cost-centers-form></app-cost-centers-form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Bodegas" [disabled]="!tabsStatus[3]">
+        <div class="mat-tab">
+          <app-stores-form></app-stores-form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Otras Apps" [disabled]="!tabsStatus[4]">
+        <div class="mat-tab">
+          <app-other-apps-form></app-other-apps-form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Solicitante" [disabled]="!tabsStatus[5]">
+        <div class="mat-tab">
+          @if (registerRequestLoading) {
+          <mat-spinner></mat-spinner>
+          } @else {
+          <app-register-responsible-form></app-register-responsible-form>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <div class="actions-container">
+    @if (isInFinalForm()) {
+    <button mat-flat-button (click)="requestUserRegistration()" color="primary"
+      [disabled]="applicantService.applicantForm().invalid">Enviar</button>
+    } @else {
+    <button mat-flat-button (click)="nextPage()" color="primary">Siguiente</button>
+    }
+  </div>
+</div>

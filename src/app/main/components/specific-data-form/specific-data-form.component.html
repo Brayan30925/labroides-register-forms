@@ -1,0 +1,43 @@
+<div class="main">
+  <div class="first-section">
+    <form [formGroup]="purchasingGroupsForm()" class="form-section" style="grid-column: 1; grid-row: 1">
+      <h2>Grupos de Compras</h2>
+      <p>Seleccione el o los grupos de compra a los cuales tendrá acceso</p>
+      <ng-container *ngFor="let purchasingGroup of purchasingGroupsFiltered()">
+        <mat-checkbox [formControlName]="purchasingGroup.id">
+          {{ purchasingGroup.name }}
+        </mat-checkbox>
+      </ng-container>
+    </form>
+
+    <form [formGroup]="positionTypeForm()" class="form-section" style="grid-column: 1; grid-row: 2">
+      <h2>Tipo de cargo</h2>
+      <mat-radio-group formControlName="positionType" name="positionType">
+        <mat-radio-button value="COMERCIAL ASSESSOR">Es Comercial</mat-radio-button>
+        <mat-radio-button value="NONE">No Aplica</mat-radio-button>
+      </mat-radio-group>
+    </form>
+  </div>
+
+  <mat-divider [vertical]="true"></mat-divider>
+
+  <form [formGroup]="companiesForm()" class="form-section" style="grid-column: 2; grid-row: 1">
+    <h2>Empresas a las que el usuario tendrá acceso</h2>
+    <ng-container *ngFor="let company of companies()">
+      <mat-checkbox [formControlName]="company.nit">
+        {{ company.name }}
+      </mat-checkbox>
+    </ng-container>
+  </form>
+
+  <mat-divider [vertical]="true"></mat-divider>
+
+  <form [formGroup]="operationCentersForm()" class="form-section" style="grid-column: 3; grid-row: 1">
+    <h2>Ciudades a las que el usuario tendrá acceso</h2>
+    <ng-container *ngFor="let operationCenter of operationCentersFiltered()">
+      <mat-checkbox [formControlName]="operationCenter.id">
+        {{ operationCenter.name }}
+      </mat-checkbox>
+    </ng-container>
+  </form>
+</div>

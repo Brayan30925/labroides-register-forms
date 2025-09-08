@@ -1,0 +1,39 @@
+<form [formGroup]="costCentersForm" class="cost-centers-form-container">
+  <!-- Filtro por grupo -->
+  <div class="filter-group-section">
+    <h3>Filtrar por grupo</h3>
+    <div class="groups-checkboxes-grid">
+      <ng-container *ngFor="let group of costCenterGroups">
+        <mat-checkbox
+          [checked]="selectedGroups.includes(group.id)"
+          (change)="
+            $event.checked
+              ? selectedGroups.push(group.id)
+              : selectedGroups.splice(selectedGroups.indexOf(group.id), 1);
+            onGroupSelectionChange()
+          "
+        >
+          {{ group.id }} - {{ group.name }}
+        </mat-checkbox>
+      </ng-container>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- Checkbox general -->
+  <div class="select-all-checkbox-container">
+    <mat-checkbox [checked]="allSelected" (change)="toggleAllCostCenters($event.checked)">
+      Seleccionar todos los centros de costo visibles
+    </mat-checkbox>
+  </div>
+
+  <!-- Checkboxes individuales -->
+  <div class="cost-centers-list-grid">
+    <ng-container *ngFor="let costCenter of visibleCostCenters">
+      <mat-checkbox [formControlName]="costCenter.id">
+        {{ costCenter.id }} - {{ costCenter.name }}
+      </mat-checkbox>
+    </ng-container>
+  </div>
+</form>

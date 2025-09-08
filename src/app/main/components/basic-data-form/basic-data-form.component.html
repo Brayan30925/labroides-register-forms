@@ -1,0 +1,158 @@
+<form [formGroup]="basicDataForm">
+  <h2>Datos personales del integrante</h2>
+  <div class="form-section">
+    <mat-form-field style="grid-row: 1; grid-column: 1">
+      <mat-label>Documento de Identidad</mat-label>
+      <input [formControl]="formControls.docId" matInput placeholder="11111111" />
+      <mat-hint>Ingresa el documento de identidad</mat-hint>
+      @if (formControls.docId.errors?.["required"]) {
+      <mat-error>Debes ingresar el documento de identidad</mat-error>
+      } @else if (formControls.docId.errors?.["pattern"]) {
+      <mat-error>El documento de identidad solo debe contener números</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field style="grid-row: 1; grid-column: 2">
+      <mat-label>Nombres</mat-label>
+      <input [formControl]="formControls.name" matInput placeholder="Pepito Antonio" />
+      <mat-hint>Ingresa los nombres</mat-hint>
+      <mat-error *ngIf="formControls.name.errors?.['required']">Debes ingresar los nombres</mat-error>
+    </mat-form-field>
+
+    <mat-form-field style="grid-row: 1; grid-column: 3">
+      <mat-label>Apellidos</mat-label>
+      <input [formControl]="formControls.lastName" matInput placeholder="Perez Perez" />
+      <mat-hint>Ingresa los apellidos</mat-hint>
+      <mat-error *ngIf="formControls.lastName.errors?.['required']">Debes ingresar los apellidos</mat-error>
+    </mat-form-field>
+
+    <mat-form-field style="grid-row: 2; grid-column: 1">
+      <mat-label>Email</mat-label>
+      <input [formControl]="formControls.email" matInput placeholder="username@equitel.com.co" />
+      <mat-hint>Ingresa el email</mat-hint>
+      @if (formControls.email.errors?.["required"]) {
+      <mat-error>Debes ingresar el email</mat-error>
+      } @else if (formControls.email.errors?.["email"]) {
+      <mat-error>El formato del email es invalido</mat-error>
+      } @else if (formControls.email.errors?.["invalidDomain"]) {
+      <mat-error>El email ingresado no es corporativo</mat-error>
+      } @else if (formControls.email.errors?.["repeatedEmail"]) {
+      <mat-error>Ya existe un usuario con este email</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field style="grid-row: 2; grid-column: 2">
+      <mat-label>Celular</mat-label>
+      <input [formControl]="formControls.phoneNumber" matInput placeholder="3101010101" />
+      <mat-hint>Ingresa el numero telefónico</mat-hint>
+      @if (formControls.phoneNumber.errors?.["required"]) {
+      <mat-error>Debes ingresar el numero telefónico</mat-error>
+      } @else if (formControls.phoneNumber.errors?.["pattern"]) {
+      <mat-error>El numero telefónico solo puede contener números</mat-error>
+      } @else if (formControls.phoneNumber.errors?.["minlength"]) {
+      <mat-error>El numero telefónico debe tener 10 caracteres</mat-error>
+      } @else if (formControls.phoneNumber.errors?.["maxlength"]) {
+      <mat-error>El numero telefónico debe tener 10 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-checkbox 
+      class="is-technician-checkbox" 
+      [formControl]="formControls.isTechnician" 
+    >
+      ¿Es técnico?
+    </mat-checkbox>
+  </div>
+
+  <h2>Datos laborales del integrante</h2>
+  <div class="form-section">
+    <mat-form-field style="grid-row: 1; grid-column: 1">
+      <mat-label>Empresa</mat-label>
+      <mat-select [formControl]="formControls.company">
+        <ng-container *ngFor="let company of companies">
+          <mat-option [value]="company.nit">{{ company.name }}</mat-option>
+        </ng-container>
+      </mat-select>
+      <mat-hint>Selecciona la empresa</mat-hint>
+      <mat-error *ngIf="formControls.company.errors?.['required']">Debes seleccionar una empresa</mat-error>
+    </mat-form-field>
+
+    <mat-form-field style="grid-row: 1; grid-column: 2">
+      <mat-label>Ciudad</mat-label>
+      <mat-select [formControl]="formControls.operationCenter">
+        <ng-container *ngFor="let operationCenter of operationCenters">
+          <mat-option [value]="operationCenter.id">{{ operationCenter.name }}</mat-option>
+        </ng-container>
+      </mat-select>
+      <mat-hint>Selecciona la ciudad</mat-hint>
+      <mat-error *ngIf="formControls.operationCenter.errors?.['required']">Debes seleccionar una ciudad</mat-error>
+    </mat-form-field>
+
+    <mat-form-field style="grid-row: 1; grid-column: 3">
+      <mat-label>Unidad de Negocio</mat-label>
+      <mat-select [formControl]="formControls.unitDeal" (selectionChange)="onUnitDealChange($event)">
+        <ng-container *ngFor="let unit of unitDeals">
+          <mat-option [value]="unit.id">{{ unit.name }}</mat-option>
+        </ng-container>
+      </mat-select>
+      <mat-hint>Selecciona la unidad de negocio</mat-hint>
+      <mat-error *ngIf="formControls.unitDeal.errors?.['required']">Debes seleccionar una unidad de negocio</mat-error>
+    </mat-form-field>
+
+    <mat-form-field style="grid-row: 1; grid-column: 4">
+      <mat-label>Centro de Costo</mat-label>
+      <mat-select [formControl]="formControls.costCenter">
+        <ng-container *ngFor="let costCenter of costCenters.getValue()">
+          <mat-option [value]="costCenter.id">{{ costCenter.id }} - {{ costCenter.name }}</mat-option>
+        </ng-container>
+      </mat-select>
+      <mat-hint>Selecciona el centro de costo</mat-hint>
+      <mat-error *ngIf="formControls.costCenter.errors?.['required']">Debes seleccionar un centro de costo</mat-error>
+    </mat-form-field>
+
+    <ng-container *ngIf="!formControls.isTechnician.value">
+      <mat-form-field style="grid-row: 2; grid-column: 1">
+        <mat-label>Cargo</mat-label>
+        <input [formControl]="formControls.position" matInput placeholder="Analista de Sistemas" />
+        <mat-hint>Ingresa el cargo</mat-hint>
+        <mat-error *ngIf="formControls.position.errors?.['required']">Debes ingresar un cargo</mat-error>
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="formControls.isTechnician.value">
+      <mat-form-field style="grid-row: 2; grid-column: 1">
+        <mat-label>Cargo</mat-label>
+        <input [formControl]="formControls.position" matInput readonly />
+      </mat-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="!formControls.isTechnician.value">
+      <mat-form-field style="grid-row: 2; grid-column: 2">
+        <mat-label>Usuario Anterior</mat-label>
+        <input [matAutocomplete]="replacement" [formControl]="formControls.previousUser" matInput
+          placeholder="Pepito Perez" />
+        <mat-autocomplete #replacement="matAutocomplete" (optionSelected)="onReplacementSelection($event)"
+          autoActiveFirstOption="true">
+          <ng-container *ngFor="let user of replacementUsers">
+            <mat-option [value]="user.name">{{ user.name }}</mat-option>
+          </ng-container>
+        </mat-autocomplete>
+        <mat-hint>Selecciona al integrante que se reemplaza y/o con el mismo perfil</mat-hint>
+        <mat-error *ngIf="formControls.previousUser.errors?.['required']">Debes seleccionar un integrante del
+          sistema</mat-error>
+      </mat-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="!formControls.isTechnician.value">
+      <mat-form-field style="grid-row: 2; grid-column: 3">
+        <mat-label>Perfil</mat-label>
+        <input [formControl]="formControls.profile" matInput readonly />
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="formControls.isTechnician.value">
+      <mat-form-field style="grid-row: 2; grid-column: 2">
+        <mat-label>Perfil</mat-label>
+        <input [formControl]="formControls.profile" matInput readonly />
+      </mat-form-field>
+    </ng-container>
+  </div>
+</form>

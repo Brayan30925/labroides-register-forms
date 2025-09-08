@@ -1,0 +1,63 @@
+.cost-centers-form-container
+  display: flex
+  flex-direction: column
+  gap: 24px // Espacio vertical entre secciones
+
+  h2, h3
+    color: #3f51b5 // Un color más profesional, como el primario de Material
+    margin-bottom: 16px
+
+  hr
+    border: none
+    border-top: 1px solid #e0e0e0 // Separador más sutil
+    margin: 24px 0
+
+  .filter-group-section, .select-all-checkbox-container, .cost-centers-list-grid
+    padding: 20px
+    border-radius: 8px
+    background-color: #f9f9f9 // Fondo ligeramente diferente
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) // Sombra sutil
+
+  .groups-checkboxes-grid, .cost-centers-list-grid
+    display: grid
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) // Columnas flexibles
+    gap: 16px // Espacio entre checkboxes
+
+    // Estilos para los checkboxes de Material para asegurar alineación
+    mat-checkbox
+      display: flex
+      align-items: center // Alinea el texto con el checkbox
+      padding: 8px 0 // Espacio interno para cada checkbox
+      .mat-mdc-checkbox-inner-container
+        margin-right: 8px // Espacio entre el checkbox y el texto
+
+  // Media queries para ajustar el número de columnas en pantallas más pequeñas
+  @media screen and (max-width: 768px)
+    .groups-checkboxes-grid, .cost-centers-list-grid
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr))
+      gap: 12px
+
+  @media screen and (max-width: 480px)
+    .groups-checkboxes-grid, .cost-centers-list-grid
+      grid-template-columns: 1fr // Una columna en móviles
+      gap: 10px
+    .filter-group-section, .select-all-checkbox-container, .cost-centers-list-grid
+      padding: 15px
+
+.select-all-checkbox-container
+  padding: 15px 20px // Ajuste de padding para el checkbox de seleccionar todo
+  mat-checkbox
+    font-weight: bold // Hacer el texto de seleccionar todo más prominente
+
+// Estilos globales de Material Checkbox (si es necesario y no se pueden evitar)
+// NOTA: ::ng-deep está obsoleto. Si puedes, usa un tema de Material o clases específicas.
+::ng-deep
+  .mat-mdc-checkbox
+    .mdc-checkbox__background
+      width: 20px
+      height: 20px
+    .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background
+      background-color: #3f51b5 !important // Color primario
+      border-color: #3f51b5 !important
+    .mdc-checkbox__native-control:enabled:not(:checked):hover ~ .mdc-checkbox__background
+      border-color: #757575 // Color de borde al pasar el ratón

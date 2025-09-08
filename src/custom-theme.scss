@@ -1,0 +1,73 @@
+@use '@angular/material' as mat;
+
+// Necesario para las funciones internas de Material
+@include mat.elevation-classes();
+@include mat.app-background();
+
+// Paleta personalizada de color primario
+$my-primary: mat.m2-define-palette((
+  50 :  #f3e5f5,
+  100:  #e1bee7,
+  200:  #ce93d8,
+  300:  #ba68c8,
+  400:  #ab47bc,
+  500:  #9c27b0, // ← Color principal que se usa por defecto
+  600:  #8e24aa,
+  700:  #7b1fa2,
+  800:  #6a1b9a,
+  900:  #4a148c,
+  A100: #ea80fc,
+  A200: #e040fb,
+  A400: #d500f9,
+  A700: #aa00ff,
+  contrast: (
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+));
+
+// Paleta personalizada de color de acento
+$my-accent: mat.m2-define-palette((
+  50 :  #fff8e1,
+  100:  #ffecb3,
+  200:  #ffe082,
+  300:  #ffd54f,
+  400:  #ffca28,
+  500:  #e16c78ca, // ← Color principal de acento
+  600:  #ffb300,
+  700:  #ffa000,
+  800:  #ff8f00,
+  900:  #ff6f00,
+  A100: #ffe57f,
+  A200: #ffd740,
+  A400: #ffc400,
+  A700: #ffab00,
+  contrast: (
+    500: black(245, 235, 235),
+    600: black,
+    700: black,
+    800: black,
+    900: black,
+    A200: black,
+    A400: black,
+    A700: black,
+  )
+));
+
+// Define el tema
+$my-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $my-primary,
+    accent: $my-accent,
+    warn: mat.m2-define-palette(mat.$m2-red-palette),
+  )
+));
+
+// Aplica todos los estilos del tema
+@include mat.all-component-themes($my-theme);

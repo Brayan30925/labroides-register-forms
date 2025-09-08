@@ -1,0 +1,27 @@
+.form-section
+  display: grid
+  gap: 32px 16px
+  padding: 20px
+  box-sizing: border-box
+
+  @media screen and (min-width: 1024px) and (max-width: 1368px)
+    width: 100%
+
+  @media screen and (min-width: 1369px) and (max-width: 1599px)
+    width: 80%
+
+  @media screen and (min-width: 1600px)
+    width: 70%
+
+  ::ng-deep .mat-mdc-checkbox
+    // Escala general del checkbox
+    transform: scale(0.9)
+
+    
+
+  ::ng-deep .mat-mdc-checkbox .mdc-checkbox__background
+    // Tamaño del fondo del check
+    width: 24px
+    height: 24px
+
+  

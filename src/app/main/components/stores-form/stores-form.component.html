@@ -1,0 +1,23 @@
+@if (stores().length !== 0) {
+  <form [formGroup]="storesForm()" class="stores-form-container">
+    <!-- Checkbox general -->
+    <div class="select-all-stores-container">
+      <mat-checkbox [checked]="allStoresSelected" (change)="toggleAllStores($event.checked)">
+        Seleccionar todas las bodegas
+      </mat-checkbox>
+    </div>
+
+    <!-- Checkboxes individuales -->
+    <div class="stores-list-grid">
+      <ng-container *ngFor="let store of stores(); index as i">
+        <mat-checkbox [formControlName]="store.idStore">
+          {{ store.idStore }} - {{ store.name }}
+        </mat-checkbox>
+      </ng-container>
+    </div>
+  </form>
+} @else {
+  <div class="no-stores-message">
+    <h1>No hay bodegas asociadas a los centros de operaciones y empresas a las que el usuario tiene acceso</h1>
+  </div>
+}

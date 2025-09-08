@@ -1,0 +1,49 @@
+<form [formGroup]="otherAppsForm()">
+  <h2>Por favor indique si el usuario requiere acceso a alguna de las siguientes plataformas:</h2>
+  <mat-slide-toggle formControlName="integrator">Integrador</mat-slide-toggle>
+
+  <mat-slide-toggle formControlName="innovation">Innovación</mat-slide-toggle>
+
+  <mat-slide-toggle formControlName="supplyChain">Cadena (documentos electrónicos)</mat-slide-toggle>
+
+  <ng-container *ngIf="otherAppsForm().controls.supplyChain.value">
+    <div>
+      <mat-checkbox formControlName="electronicInvoicesIssuance">Emisión de Facturas</mat-checkbox>
+      <mat-checkbox formControlName="electronicInvoicesReception">Recepción de Facturas</mat-checkbox>
+      <mat-checkbox formControlName="supportDocsAccess">Documentos de Soporte</mat-checkbox>
+    </div>
+  </ng-container>
+
+  <div>
+    <mat-slide-toggle formControlName="crm">CRM</mat-slide-toggle>
+  </div>
+
+  <!-- !!! NUEVO: Opción de Viáticos y su campo de búsqueda asociado !!! -->
+  <div>
+    <mat-slide-toggle formControlName="travelExpenses">Viaticos</mat-slide-toggle>
+  </div>
+
+  <!-- Contenedor que solo se muestra si 'Viaticos' está activado -->
+  <ng-container *ngIf="otherAppsForm().controls.travelExpenses.value">
+    <div class="approver-search-container">
+      <mat-form-field>
+        <mat-label>Aprobador de viáticos</mat-label>
+        <input
+          [matAutocomplete]="approver"
+          [formControl]="otherAppsForm().controls.travelExpensesApprover"
+          matInput
+          placeholder="Nombre del Aprobador"
+        />
+        <mat-autocomplete #approver="matAutocomplete" (optionSelected)="onApproverSelection($event)" autoActiveFirstOption="true">
+          <ng-container *ngFor="let user of approverUsers">
+            <mat-option [value]="user.name">{{ user.name }}</mat-option>
+          </ng-container>
+        </mat-autocomplete>
+        <mat-hint>Ingresa el nombre del usuario que aprobará viáticos</mat-hint>
+        @if (otherAppsForm().controls.travelExpensesApprover.errors?.['required']) {
+          <mat-error>Debes seleccionar un aprobador</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </ng-container>
+</form>
