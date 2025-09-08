@@ -127,12 +127,12 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
                     // Habilitar y limpiar campos específicos
                     positionControl.enable()
                     // CORRECCIÓN: Agregamos el validador `pattern` para que no acepte solo espacios
-                    positionControl.setValidators([Validators.required, Validators.pattern(/^.*\S.*$/)])
+                   
                     positionControl.setValue('')
 
                     previousUserControl.enable()
                     // CORRECCIÓN: Agregamos el validador `pattern` para que no acepte solo espacios
-                    previousUserControl.setValidators([Validators.required, Validators.pattern(/^.*\S.*$/)])
+                    
                     previousUserControl.setValue('')
 
                     profileControl.enable()

@@ -1,33 +1,57 @@
 import { Injectable } from "@angular/core"
 import { BasicDataFormGroup, BasicDataFormModel } from "../../models/forms/BasicData"
-import { NonNullableFormBuilder, Validators } from "@angular/forms" // Asegúrate de que NonNullableFormBuilder esté importado
+import { NonNullableFormBuilder, Validators } from "@angular/forms"
 import { emailDomainValidator } from "../../validators/email-domain.validator"
+import { noWhitespaceValidator } from "../../validators/no-whitespace.validator"
 
 @Injectable({
-  providedIn: "root"
+  providedIn: "root"
 })
 export class BasicDataFormService {
-  basicDataForm: BasicDataFormGroup
+  basicDataForm: BasicDataFormGroup
 
-  formControls: BasicDataFormModel = {
-    docId: this.formBuilder.control("", [Validators.required, Validators.pattern(/[0-9]+/)]),
-    name: this.formBuilder.control("", [Validators.required]),
-    lastName: this.formBuilder.control("", [Validators.required]),
-    phoneNumber: this.formBuilder.control("", [Validators.required, Validators.pattern(/[0-9]+/), Validators.minLength(10), Validators.maxLength(10)]),
-    email: this.formBuilder.control("", [Validators.required, Validators.email, emailDomainValidator("@equitel.com.co")]),
-    // --- Agrega el control para 'isTechnician' aquí ---
-    isTechnician: this.formBuilder.control(false), // Valor inicial: false (desmarcado)
-    // --------------------------------------------------
-    operationCenter: this.formBuilder.control("", [Validators.required]),
-    position: this.formBuilder.control("", [Validators.required]),
-    previousUser: this.formBuilder.control("", [Validators.required]),
-    company: this.formBuilder.control("", [Validators.required]),
-    unitDeal: this.formBuilder.control("", [Validators.required]),
-    costCenter: this.formBuilder.control("", [Validators.required]),
-    profile: this.formBuilder.control(""),
-  }
+  formControls: BasicDataFormModel = {
+    docId: this.formBuilder.control("", [
+      Validators.required,
+      Validators.pattern(/[0-9]+/)
+    ]),
+    name: this.formBuilder.control("", [
+      Validators.required,
+      noWhitespaceValidator()
+    ]),
+    lastName: this.formBuilder.control("", [
+      Validators.required,
+      noWhitespaceValidator()
+    ]),
+    phoneNumber: this.formBuilder.control("", [
+      Validators.required,
+      Validators.pattern(/[0-9]+/),
+      Validators.minLength(10),
+      Validators.maxLength(10)
+    ]),
+    email: this.formBuilder.control("", [
+      Validators.required,
+      Validators.email,
+      emailDomainValidator("@equitel.com.co")
+    ]),
+    isTechnician: this.formBuilder.control(false),
 
-  constructor(private formBuilder: NonNullableFormBuilder) {
-    this.basicDataForm = this.formBuilder.group(this.formControls)
-  }
+    operationCenter: this.formBuilder.control("", [Validators.required]),
+    position: this.formBuilder.control("", [
+      Validators.required,
+      noWhitespaceValidator()
+    ]),
+    previousUser: this.formBuilder.control("", [
+      Validators.required,
+      noWhitespaceValidator()
+    ]),
+    company: this.formBuilder.control("", [Validators.required]),
+    unitDeal: this.formBuilder.control("", [Validators.required]),
+    costCenter: this.formBuilder.control("", [Validators.required]),
+    profile: this.formBuilder.control(""),
+  }
+
+  constructor(private formBuilder: NonNullableFormBuilder) {
+    this.basicDataForm = this.formBuilder.group(this.formControls)
+  }
 }
