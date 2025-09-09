@@ -76,10 +76,10 @@ export class AppComponent {
     this.currentFormIndex = signal(0)
 
     this.masterForm = this.fb.group({
-      basicData: this.basicDataFormService.basicDataForm, // Ya no es un signal, se usa directamente
+      basicData: this.basicDataFormService.basicDataForm,
       companies: this.companiesService.companiesForm(),
       operationCenters: this.operationCentersService.operationCentersForm(),
-      costCenters: this.costCentersService.costCentersForm.getValue(), // CORRECCIÓN: .getValue()
+      costCenters: this.costCentersService.costCentersForm.getValue(),
       stores: this.storesService.storesForm(),
       purchasingGroups: this.purchasingGroupsService.purchasingGroupsForm(),
       otherApps: this.otherAppsService.otherAppsForm(),
@@ -102,46 +102,64 @@ export class AppComponent {
     return form.valid
   }
 
+  // Lógica de validación mejorada para el formulario actual
   isCurrentFormValid(): boolean {
-    let currentForm: FormGroup | null = null
+    let formValid = true
+    let message = ''
 
     switch (this.currentFormIndex()) {
       case 0:
-        currentForm = this.masterForm.get('basicData') as FormGroup
+        // Validar solo el formulario de datos básicos
+        formValid = this.isFormValid(this.masterForm.get('basicData') as FormGroup)
+        message = "¡Revisa los datos del formulario básico!"
         break
       case 1:
-        const validCompanies = this.isFormValid(this.masterForm.get('companies') as FormGroup)
-        const validOperations = this.isFormValid(this.masterForm.get('operationCenters') as FormGroup)
-        if (!validCompanies) this.showMessage("¡Recuerda que debes seleccionar al menos una empresa!")
-        if (!validOperations) this.showMessage("¡Recuerda que debes seleccionar al menos un centro de operaciones!")
-        return validCompanies && validOperations
+        // Validar los dos formularios de la pestaña de datos específicos
+        const companiesForm = this.masterForm.get('companies') as FormGroup
+        const operationsForm = this.masterForm.get('operationCenters') as FormGroup
+        const purchasingGroupsForm = this.masterForm.get('purchasingGroups') as FormGroup
+        const positionTypeForm = this.masterForm.get('positionType') as FormGroup
+
+        formValid = this.isFormValid(companiesForm) &&
+                    this.isFormValid(operationsForm) &&
+                    this.isFormValid(purchasingGroupsForm) &&
+                    this.isFormValid(positionTypeForm)
+        message = "¡Revisa los datos de las empresas, centros de operaciones, grupos de compra y tipo de cargo!"
+        break
 
       case 2:
-        currentForm = this.masterForm.get('costCenters') as FormGroup
+        // Validar el formulario de centros de costo
+        formValid = this.isFormValid(this.masterForm.get('costCenters') as FormGroup)
+        message = "¡Revisa los datos del formulario de centros de costo!"
         break
 
       case 3:
-        currentForm = this.masterForm.get('stores') as FormGroup
+        // Validar el formulario de bodegas
+        formValid = this.isFormValid(this.masterForm.get('stores') as FormGroup)
+        message = "¡Revisa los datos del formulario de bodegas!"
         break
 
       case 4:
-        currentForm = this.masterForm.get('otherApps') as FormGroup
+        // Validar el formulario de otras aplicaciones
+        formValid = this.isFormValid(this.masterForm.get('otherApps') as FormGroup)
+        message = "¡Revisa los datos del formulario de otras aplicaciones!"
         break
 
       case 5:
-        currentForm = this.masterForm.get('responsible') as FormGroup
+        // Validar el formulario del solicitante
+        formValid = this.isFormValid(this.masterForm.get('responsible') as FormGroup)
+        message = "¡Revisa los datos del formulario de solicitante!"
         break
 
       default:
-        return true
+        formValid = true
+    }
+    
+    if (!formValid) {
+      this.showMessage(message)
     }
 
-    if (currentForm && !this.isFormValid(currentForm)) {
-      this.showMessage('¡Revisa los datos de este formulario!')
-      return false
-    }
-
-    return true
+    return formValid
   }
 
   isInFinalForm() {
@@ -167,13 +185,13 @@ export class AppComponent {
   getRequestData(): RegisterUserRequest {
     const positionTypeData = this.positionTypeService.positionTypeForm().getRawValue()
     return <RegisterUserRequest>{
-      basicData: this.basicDataFormService.basicDataForm.getRawValue(), // CORRECCIÓN: Sin ()
+      basicData: this.basicDataFormService.basicDataForm.getRawValue(),
       otherApps: this.otherAppsService.otherAppsForm().getRawValue(),
       applicationData: this.applicantService.applicantForm().getRawValue(),
       selectedCompanies: this.getSelectedItems(this.companiesService.companiesForm().getRawValue()),
       selectedOperationCenters: this.getSelectedItems(this.operationCentersService.operationCentersForm().getRawValue()),
       selectedPurchasingGroups: this.getSelectedItems(this.purchasingGroupsService.purchasingGroupsForm().getRawValue()),
-      selectedCostCenters: this.getSelectedItems(this.costCentersService.costCentersForm.getValue().getRawValue()), // CORRECCIÓN: .getValue()
+      selectedCostCenters: this.getSelectedItems(this.costCentersService.costCentersForm.getValue().getRawValue()),
       selectedStores: this.getSelectedItems(this.storesService.storesForm().getRawValue()),
       isTechnician: this.isTechnician,
       isComercialAssessor: positionTypeData.positionType === "COMERCIAL ASSESSOR",
