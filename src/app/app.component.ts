@@ -1,127 +1,151 @@
-import { Component, effect, EffectRef, signal, WritableSignal } from "@angular/core"
+import { Component, signal, WritableSignal } from "@angular/core";
+import { FormBuilder, FormGroup } from "@angular/forms";
+import { NgOptimizedImage } from "@angular/common";
+import { MatTabsModule } from "@angular/material/tabs";
+import { MatButtonModule } from "@angular/material/button";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatDialog } from "@angular/material/dialog";
 
-import { FormGroup } from "@angular/forms"
-import { NgOptimizedImage } from "@angular/common"
-import { MatTabsModule } from "@angular/material/tabs"
-import { MatButtonModule } from "@angular/material/button"
-import { MatToolbarModule } from "@angular/material/toolbar"
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
-import { MatSnackBar } from "@angular/material/snack-bar"
-import { MatDialog } from "@angular/material/dialog"
+import { SharedModule } from "./shared/shared.module";
+import { BasicDataFormComponent } from "./main/components/basic-data-form/basic-data-form.component";
+import { CostCentersFormComponent } from "./main/components/cost-centers-form/cost-centers-form.component";
+import { OtherAppsFormComponent } from "./main/components/other-apps-form/other-apps-form.component";
+import { SpecificDataFormComponent } from "./main/components/specific-data-form/specific-data-form.component";
+import { StoresFormComponent } from "./main/components/stores-form/stores-form.component";
+import { RegisterResponsibleFormComponent } from "./main/components/register-responsible-form/register-responsible-form.component";
+import { ConfirmationDialogComponent } from "./main/components/confirmation-dialog/confirmation-dialog.component";
 
-import { SharedModule } from "./shared/shared.module"
-import { BasicDataFormComponent } from "./main/components/basic-data-form/basic-data-form.component"
-import { CostCentersFormComponent } from "./main/components/cost-centers-form/cost-centers-form.component"
-import { OtherAppsFormComponent } from "./main/components/other-apps-form/other-apps-form.component"
-import { SpecificDataFormComponent } from "./main/components/specific-data-form/specific-data-form.component"
-import { StoresFormComponent } from "./main/components/stores-form/stores-form.component"
-import { RegisterResponsibleFormComponent } from "./main/components/register-responsible-form/register-responsible-form.component"
-import { ConfirmationDialogComponent } from "./main/components/confirmation-dialog/confirmation-dialog.component"
-import { BasicDataFormService } from "./main/services/forms/basic-data-form.service"
-import { OperationCentersFormService } from "./main/services/forms/operation-centers-form.service"
-import { CompaniesFormService } from "./main/services/forms/companies-form.service"
-import { CostCentersFormService } from "./main/services/forms/cost-centers-form.service"
-import { StoresFormService } from "./main/services/forms/stores-form.service"
-import { PurchasingGroupsFormService } from "./main/services/forms/purchasing-groups-form.service"
-import { PositionTypeFormService } from "./main/services/forms/position-type-form.service"
-import { OtherAppsFormService } from "./main/services/forms/other-apps-form.service"
-import { ApplicantFormService } from "./main/services/forms/applicant-form.service"
-import { EquitelService } from "./main/services/api/equitel.service"
-import { RegisterUserRequest } from "./main/models/request/RegisterUserRequest"
-import { CheckBoxSet } from "./main/models/forms/CheckBoxForm"
-import { EmptyResponse } from "./main/models/responses/EmptyResponse"
+import { BasicDataFormService } from "./main/services/forms/basic-data-form.service";
+import { OperationCentersFormService } from "./main/services/forms/operation-centers-form.service";
+import { CompaniesFormService } from "./main/services/forms/companies-form.service";
+import { CostCentersFormService } from "./main/services/forms/cost-centers-form.service";
+import { StoresFormService } from "./main/services/forms/stores-form.service";
+import { PurchasingGroupsFormService } from "./main/services/forms/purchasing-groups-form.service";
+import { PositionTypeFormService } from "./main/services/forms/position-type-form.service";
+import { OtherAppsFormService } from "./main/services/forms/other-apps-form.service";
+import { ApplicantFormService } from "./main/services/forms/applicant-form.service";
+import { EquitelService } from "./main/services/api/equitel.service";
+import { RegisterUserRequest } from "./main/models/request/RegisterUserRequest";
+import { CheckBoxSet } from "./main/models/forms/CheckBoxForm";
+import { EmptyResponse } from "./main/models/responses/EmptyResponse";
 
-const components = [BasicDataFormComponent, SpecificDataFormComponent, CostCentersFormComponent, StoresFormComponent, OtherAppsFormComponent, RegisterResponsibleFormComponent]
-const materialModules = [MatTabsModule, MatButtonModule, MatToolbarModule, MatProgressSpinnerModule]
-const directives = [NgOptimizedImage]
+const components = [
+  BasicDataFormComponent,
+  SpecificDataFormComponent,
+  CostCentersFormComponent,
+  StoresFormComponent,
+  OtherAppsFormComponent,
+  RegisterResponsibleFormComponent,
+];
+const materialModules = [MatTabsModule, MatButtonModule, MatToolbarModule, MatProgressSpinnerModule];
+const directives = [NgOptimizedImage];
 
 @Component({
-    selector: "app-root",
-    templateUrl: "app.component.html",
-    styleUrls: ["app.component.sass"],
-    imports: [SharedModule, ...directives, ...components, ...materialModules]
+  selector: "app-root",
+  templateUrl: "app.component.html",
+  styleUrls: ["app.component.sass"],
+  imports: [SharedModule, ...directives, ...components, ...materialModules],
 })
 export class AppComponent {
-  currentFormIndex: WritableSignal<number>
-  registerRequestLoading: boolean
-  tabsStatus: boolean[]
-  isTechnician: boolean = false
+  currentFormIndex: WritableSignal<number>;
+  registerRequestLoading = false;
+  tabsStatus: boolean[];
+  isTechnician = false;
 
-  constructor(private basicDataFormService: BasicDataFormService, private operationCentersService: OperationCentersFormService, private companiesService: CompaniesFormService,
-              private costCentersService: CostCentersFormService, private storesService: StoresFormService, private purchasingGroupsService: PurchasingGroupsFormService,
-              private positionTypeService: PositionTypeFormService, private otherAppsService: OtherAppsFormService, protected applicantService: ApplicantFormService,
-              private equitelService: EquitelService, private snackBar: MatSnackBar, private dialog: MatDialog) {
-    this.registerRequestLoading = false
-    this.tabsStatus = [true, false, false, false, false, false]
-    this.currentFormIndex = signal(0)
+  // Formulario maestro
+  masterForm: FormGroup;
+
+  constructor(
+    private fb: FormBuilder,
+    private basicDataFormService: BasicDataFormService,
+    private operationCentersService: OperationCentersFormService,
+    private companiesService: CompaniesFormService,
+    private costCentersService: CostCentersFormService,
+    private storesService: StoresFormService,
+    private purchasingGroupsService: PurchasingGroupsFormService,
+    private positionTypeService: PositionTypeFormService,
+    private otherAppsService: OtherAppsFormService,
+    protected applicantService: ApplicantFormService,
+    private equitelService: EquitelService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
+  ) {
+    this.tabsStatus = [true, false, false, false, false, false];
+    this.currentFormIndex = signal(0);
+
+    // Crear formulario maestro agrupando todos los subformularios
+    this.masterForm = this.fb.group({
+      basicData: this.basicDataFormService.basicDataForm,
+      companies: this.companiesService.companiesForm(),
+      operationCenters: this.operationCentersService.operationCentersForm(),
+      costCenters: this.costCentersService.costCentersForm.getValue(),
+      stores: this.storesService.storesForm(),
+      purchasingGroups: this.purchasingGroupsService.purchasingGroupsForm(),
+      otherApps: this.otherAppsService.otherAppsForm(),
+      responsible: this.applicantService.applicantForm(),
+      positionType: this.positionTypeService.positionTypeForm(),
+    });
   }
 
-  onTechnicianStatusChange(isTechnician: boolean): void {
-    this.isTechnician = isTechnician
+  onTechnicianStatusChange(isTechnician: boolean) {
+    this.isTechnician = isTechnician;
   }
 
   showMessage(message: string) {
-    this.snackBar.open(message, "OK", { duration: 4000 })
+    this.snackBar.open(message, "OK", { duration: 4000 });
   }
 
+  // Validar cualquier formulario
   isFormValid(form: FormGroup) {
-    form.updateValueAndValidity()
-    form.markAllAsTouched()
-    return form.valid
+    form.updateValueAndValidity({ onlySelf: false });
+    form.markAllAsTouched();
+    return form.valid;
   }
 
+  // Validar formulario actual según la tab activa
   isCurrentFormValid(): boolean {
-    let formValid: boolean
+    const tabKeys = [
+      "basicData",
+      "companies",
+      "operationCenters",
+      "costCenters",
+      "stores",
+      "otherApps",
+      "responsible",
+    ];
 
-    if (this.currentFormIndex() === 0) {
-      formValid = this.isFormValid(this.basicDataFormService.basicDataForm)
-      if (!formValid) this.showMessage("¡Revisa el formulario! Algunos datos están mal")
-    } else if (this.currentFormIndex() === 1) {
-      const validCompaniesForm = this.isFormValid(this.companiesService.companiesForm())
-      const validOperationCentersForm = this.isFormValid(this.operationCentersService.operationCentersForm())
-      if (!validCompaniesForm) this.showMessage("¡Recuerda que debes seleccionar al menos una empresa!")
-      if (!validOperationCentersForm) this.showMessage("¡Recuerda que debes seleccionar al menos un centro de operaciones!")
-      formValid = validCompaniesForm && validOperationCentersForm
-    } else if (this.currentFormIndex() === 2) {
-      formValid = this.isFormValid(this.costCentersService.costCentersForm.getValue())
-      if (!formValid) this.showMessage("¡Recuerda que debes seleccionar al menos un centro de costo!")
-    } else if (this.currentFormIndex() === 3) {
-      formValid = this.isFormValid(this.storesService.storesForm())
-      if (!formValid) this.showMessage("¡Debes seleccionar al menos una bodega!")
-    } else if (this.currentFormIndex() === 4) {
-      formValid = this.isFormValid(this.otherAppsService.otherAppsForm())
-      if (!formValid) this.showMessage("¡Hay un error en el formulario de otras apps!")
-    } else if (this.currentFormIndex() === 5) {
-      formValid = this.isFormValid(this.applicantService.applicantForm())
-      if (!formValid) this.showMessage("¡Hay algún error en los datos de registro del responsable del formulario!")
-    } else {
-      formValid = true
+    const currentForm = this.masterForm.get(tabKeys[this.currentFormIndex()]);
+    if (!this.isFormValid(currentForm as FormGroup)) {
+      this.showMessage("¡Revisa los datos de este formulario!");
+      return false;
     }
-
-    return formValid
+    return true;
   }
 
   isInFinalForm() {
-    return this.currentFormIndex() === this.tabsStatus.length - 1
+    return this.currentFormIndex() === this.tabsStatus.length - 1;
   }
 
   nextPage() {
     if (this.isCurrentFormValid()) {
       if (this.isTechnician) {
-        this.currentFormIndex.set(this.tabsStatus.length - 1)
-        this.tabsStatus = [true, false, false, false, false, true]
+        this.currentFormIndex.set(this.tabsStatus.length - 1);
+        this.tabsStatus = [true, false, false, false, false, true];
       } else {
-        const nextIndex = this.currentFormIndex() + 1
-        this.currentFormIndex.set(nextIndex)
-        this.tabsStatus[nextIndex] = true
+        const nextIndex = this.currentFormIndex() + 1;
+        this.currentFormIndex.set(nextIndex);
+        this.tabsStatus[nextIndex] = true;
       }
     }
   }
 
-  getSelectedItems = (formValue: CheckBoxSet): string[] => Object.keys(formValue).filter(id => formValue[id])
+  getSelectedItems = (formValue: CheckBoxSet): string[] =>
+    Object.keys(formValue).filter((id) => formValue[id]);
 
   getRequestData(): RegisterUserRequest {
-    const positionTypeData = this.positionTypeService.positionTypeForm().getRawValue()
+    const positionTypeData = this.positionTypeService.positionTypeForm().getRawValue();
     return <RegisterUserRequest>{
       basicData: this.basicDataFormService.basicDataForm.getRawValue(),
       otherApps: this.otherAppsService.otherAppsForm().getRawValue(),
@@ -132,43 +156,38 @@ export class AppComponent {
       selectedCostCenters: this.getSelectedItems(this.costCentersService.costCentersForm.getValue().getRawValue()),
       selectedStores: this.getSelectedItems(this.storesService.storesForm().getRawValue()),
       isTechnician: this.isTechnician,
-      isComercialAssessor: positionTypeData.positionType === "COMERCIAL ASSESSOR"
-    }
+      isComercialAssessor: positionTypeData.positionType === "COMERCIAL ASSESSOR",
+    };
   }
 
   resetForms(): void {
-    this.basicDataFormService.basicDataForm.reset()
-    this.companiesService.companiesForm().reset()
-    this.operationCentersService.operationCentersForm().reset()
-    this.costCentersService.costCentersForm.getValue().reset()
-    this.purchasingGroupsService.purchasingGroupsForm().reset()
-    this.storesService.storesForm().reset()
-    this.applicantService.applicantForm().reset()
-    this.positionTypeService.positionTypeForm().reset()
-    this.otherAppsService.otherAppsForm().reset()
+    Object.keys(this.masterForm.controls).forEach((key) => {
+      this.masterForm.get(key)?.reset();
+    });
+    this.currentFormIndex.set(0);
+    this.tabsStatus = [true, false, false, false, false, false];
+    this.isTechnician = false;
   }
 
-  // !!! CORRECCIÓN: Se agrega la lógica para reiniciar el estado de la aplicación !!!
   onSuccessfulSubmit(r: EmptyResponse) {
-    this.registerRequestLoading = false
-    const dialogData = { message: r.description }
-    this.dialog.open(ConfirmationDialogComponent, { data: dialogData })
-    
-    // Reiniciar todos los formularios
-    this.resetForms()
-    
-    // Volver a la primera pestaña
-    this.currentFormIndex.set(0)
-    
-    // Reiniciar el estado de las pestañas
-    this.tabsStatus = [true, false, false, false, false, false]
-    
-    // Reiniciar el estado de la variable de técnico
-    this.isTechnician = false
+    this.registerRequestLoading = false;
+    this.dialog.open(ConfirmationDialogComponent, { data: { message: r.description } });
+    this.resetForms();
   }
 
   requestUserRegistration() {
-    this.registerRequestLoading = true
-    this.equitelService.createUser(this.getRequestData()).subscribe({ next: this.onSuccessfulSubmit.bind(this) })
+    // Validar todo el formulario maestro antes de enviar
+    this.masterForm.updateValueAndValidity({ onlySelf: false });
+    this.masterForm.markAllAsTouched();
+
+    if (this.masterForm.invalid) {
+      this.showMessage("¡Hay datos incompletos! Corrige los errores antes de enviar.");
+      return;
+    }
+
+    this.registerRequestLoading = true;
+    this.equitelService.createUser(this.getRequestData()).subscribe({
+      next: this.onSuccessfulSubmit.bind(this),
+    });
   }
 }
