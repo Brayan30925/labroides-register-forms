@@ -102,39 +102,57 @@ export class AppComponent {
     return form.valid
   }
 
-  // Lógica de validación mejorada para el formulario actual
   isCurrentFormValid(): boolean {
-    // Definimos el orden de las pestañas para validar
-    const formKeys = [
-      'basicData',
-      ['companies', 'operationCenters', 'purchasingGroups', 'positionType'],
-      'costCenters',
-      'stores',
-      'otherApps',
-      'responsible'
-    ];
+    let formValid = true
+    let message = ''
 
-    let formsToValidate: (string | string[]) = formKeys[this.currentFormIndex()];
+    switch (this.currentFormIndex()) {
+      case 0:
+        formValid = this.isFormValid(this.masterForm.get('basicData') as FormGroup)
+        message = "¡Revisa los datos del formulario básico!"
+        break
+      case 1:
+        const companiesForm = this.masterForm.get('companies') as FormGroup
+        const operationsForm = this.masterForm.get('operationCenters') as FormGroup
+        const purchasingGroupsForm = this.masterForm.get('purchasingGroups') as FormGroup
+        const positionTypeForm = this.masterForm.get('positionType') as FormGroup
 
-    if (Array.isArray(formsToValidate)) {
-      // Caso de pestañas con múltiples formularios
-      for (const key of formsToValidate) {
-        const form = this.masterForm.get(key) as FormGroup;
-        if (!this.isFormValid(form)) {
-          this.showMessage(`¡Revisa los datos en la sección de ${key}!`);
-          return false;
-        }
-      }
-    } else {
-      // Caso de pestañas con un solo formulario
-      const form = this.masterForm.get(formsToValidate) as FormGroup;
-      if (!this.isFormValid(form)) {
-        this.showMessage('¡Revisa los datos en este formulario!');
-        return false;
-      }
+        formValid = this.isFormValid(companiesForm) &&
+                    this.isFormValid(operationsForm) &&
+                    this.isFormValid(purchasingGroupsForm) &&
+                    this.isFormValid(positionTypeForm)
+        message = "¡Revisa los datos de las empresas, centros de operaciones, grupos de compra y tipo de cargo!"
+        break
+
+      case 2:
+        formValid = this.isFormValid(this.masterForm.get('costCenters') as FormGroup)
+        message = "¡Revisa los datos del formulario de centros de costo!"
+        break
+
+      case 3:
+        formValid = this.isFormValid(this.masterForm.get('stores') as FormGroup)
+        message = "¡Revisa los datos del formulario de bodegas!"
+        break
+
+      case 4:
+        formValid = this.isFormValid(this.masterForm.get('otherApps') as FormGroup)
+        message = "¡Revisa los datos del formulario de otras aplicaciones!"
+        break
+
+      case 5:
+        formValid = this.isFormValid(this.masterForm.get('responsible') as FormGroup)
+        message = "¡Revisa los datos del formulario de solicitante!"
+        break
+
+      default:
+        formValid = true
+    }
+    
+    if (!formValid) {
+      this.showMessage(message)
     }
 
-    return true;
+    return formValid
   }
 
   isInFinalForm() {
@@ -142,63 +160,15 @@ export class AppComponent {
   }
 
   nextPage() {
-    // Validamos todos los formularios desde el inicio hasta el actual
-    const formKeys = ['basicData', 'companies', 'operationCenters', 'purchasingGroups', 'positionType', 'costCenters', 'stores', 'otherApps', 'responsible'];
-
-    for (let i = 0; i <= this.currentFormIndex(); i++) {
-        let currentForm: FormGroup | null = null;
-        let formName = '';
-
-        switch(i) {
-            case 0:
-                currentForm = this.masterForm.get('basicData') as FormGroup;
-                formName = 'Datos Básicos';
-                break;
-            case 1:
-                // Pestaña de SpecificDataForm
-                const formsSpecific = ['companies', 'operationCenters', 'purchasingGroups', 'positionType'];
-                for (const key of formsSpecific) {
-                    const form = this.masterForm.get(key) as FormGroup;
-                    if (!this.isFormValid(form)) {
-                        this.currentFormIndex.set(i);
-                        this.showMessage(`¡Revisa los datos en la sección de ${formName} (Formulario de ${key})!`);
-                        return;
-                    }
-                }
-                break;
-            case 2:
-                currentForm = this.masterForm.get('costCenters') as FormGroup;
-                formName = 'Centros de Costo';
-                break;
-            case 3:
-                currentForm = this.masterForm.get('stores') as FormGroup;
-                formName = 'Bodegas';
-                break;
-            case 4:
-                currentForm = this.masterForm.get('otherApps') as FormGroup;
-                formName = 'Otras Apps';
-                break;
-            case 5:
-                currentForm = this.masterForm.get('responsible') as FormGroup;
-                formName = 'Solicitante';
-                break;
-        }
-        
-        if (i !== 1 && currentForm && !this.isFormValid(currentForm)) {
-            this.currentFormIndex.set(i);
-            this.showMessage(`¡Revisa los datos en la sección de ${formName}!`);
-            return;
-        }
-    }
-
-    // Si todo es válido, continuamos la navegación
-    if (this.isTechnician) {
-      this.currentFormIndex.set(this.tabsStatus.length - 1)
-      this.tabsStatus = [true, false, false, false, false, true]
-    } else {
-      const nextIndex = this.currentFormIndex() + 1
-      this.currentFormIndex.set(nextIndex)
-      this.tabsStatus[nextIndex] = true
+    if (this.isCurrentFormValid()) {
+      if (this.isTechnician) {
+        this.currentFormIndex.set(this.tabsStatus.length - 1)
+        this.tabsStatus = [true, false, false, false, false, true]
+      } else {
+        const nextIndex = this.currentFormIndex() + 1
+        this.currentFormIndex.set(nextIndex)
+        this.tabsStatus[nextIndex] = true
+      }
     }
   }
 
