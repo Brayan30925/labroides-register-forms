@@ -36,139 +36,149 @@ const materialModules = [MatTabsModule, MatButtonModule, MatToolbarModule, MatPr
 const directives = [NgOptimizedImage]
 
 @Component({
-  selector: "app-root",
-  templateUrl: "app.component.html",
-  styleUrls: ["app.component.sass"],
-  imports: [SharedModule, ...directives, ...components, ...materialModules],
-  standalone: true
+    selector: "app-root",
+    templateUrl: "app.component.html",
+    styleUrls: ["app.component.sass"],
+    imports: [SharedModule, ...directives, ...components, ...materialModules],
+    standalone: true
 })
 export class AppComponent {
-  currentFormIndex: WritableSignal<number>
-  registerRequestLoading: boolean
-  tabsStatus: boolean[]
-  isTechnician: boolean = false
+  currentFormIndex: WritableSignal<number>
+  registerRequestLoading: boolean
+  tabsStatus: boolean[]
+  isTechnician: boolean = false
 
-  constructor(private basicDataFormService: BasicDataFormService, private operationCentersService: OperationCentersFormService, private companiesService: CompaniesFormService,
-              private costCentersService: CostCentersFormService, private storesService: StoresFormService, private purchasingGroupsService: PurchasingGroupsFormService,
-              private positionTypeService: PositionTypeFormService, private otherAppsService: OtherAppsFormService, protected applicantService: ApplicantFormService,
-              private equitelService: EquitelService, private snackBar: MatSnackBar, private dialog: MatDialog) {
-    this.registerRequestLoading = false
-    this.tabsStatus = [true, false, false, false, false, false]
-    this.currentFormIndex = signal(0)
-  }
+  constructor(private basicDataFormService: BasicDataFormService, private operationCentersService: OperationCentersFormService, private companiesService: CompaniesFormService,
+              private costCentersService: CostCentersFormService, private storesService: StoresFormService, private purchasingGroupsService: PurchasingGroupsFormService,
+              private positionTypeService: PositionTypeFormService, private otherAppsService: OtherAppsFormService, protected applicantService: ApplicantFormService,
+              private equitelService: EquitelService, private snackBar: MatSnackBar, private dialog: MatDialog) {
+    this.registerRequestLoading = false
+    this.tabsStatus = [true, false, false, false, false, false]
+    this.currentFormIndex = signal(0)
+  }
 
-  onTechnicianStatusChange(isTechnician: boolean): void {
-    this.isTechnician = isTechnician
-  }
+  onTechnicianStatusChange(isTechnician: boolean): void {
+    this.isTechnician = isTechnician
+  }
 
-  showMessage(message: string) {
-    this.snackBar.open(message, "OK", { duration: 4000 })
-  }
+  showMessage(message: string) {
+    this.snackBar.open(message, "OK", { duration: 4000 })
+  }
 
-  isFormValid(form: FormGroup) {
-    form.updateValueAndValidity()
-    form.markAllAsTouched()
-    return form.valid
-  }
+  isFormValid(form: FormGroup) {
+    form.updateValueAndValidity()
+    form.markAllAsTouched()
+    return form.valid
+  }
 
-  isCurrentFormValid(): boolean {
-    let formValid: boolean
+  isCurrentFormValid(): boolean {
+    let formValid: boolean
 
-    if (this.currentFormIndex() === 0) {
-      formValid = this.isFormValid(this.basicDataFormService.basicDataForm)
-      if (!formValid) this.showMessage("¡Revisa el formulario! Algunos datos están mal")
-    } else if (this.currentFormIndex() === 1) {
-      const validCompaniesForm = this.isFormValid(this.companiesService.companiesForm())
-      const validOperationCentersForm = this.isFormValid(this.operationCentersService.operationCentersForm())
-      if (!validCompaniesForm) this.showMessage("¡Recuerda que debes seleccionar al menos una empresa!")
-      if (!validOperationCentersForm) this.showMessage("¡Recuerda que debes seleccionar al menos un centro de operaciones!")
-      formValid = validCompaniesForm && validOperationCentersForm
-    } else if (this.currentFormIndex() === 2) {
-      formValid = this.isFormValid(this.costCentersService.costCentersForm.getValue())
-      if (!formValid) this.showMessage("¡Recuerda que debes seleccionar al menos un centro de costo!")
-    } else if (this.currentFormIndex() === 3) {
-      formValid = this.isFormValid(this.storesService.storesForm())
-      if (!formValid) this.showMessage("¡Debes seleccionar al menos una bodega!")
-    } else if (this.currentFormIndex() === 4) {
-      formValid = this.isFormValid(this.otherAppsService.otherAppsForm())
-      if (!formValid) this.showMessage("¡Hay un error en el formulario de otras apps!")
-    } else if (this.currentFormIndex() === 5) {
-      formValid = this.isFormValid(this.applicantService.applicantForm())
-      if (!formValid) this.showMessage("¡Hay algún error en los datos de registro del responsable del formulario!")
-    } else {
-      formValid = true
-    }
+    if (this.currentFormIndex() === 0) {
+      formValid = this.isFormValid(this.basicDataFormService.basicDataForm)
+      if (!formValid) this.showMessage("¡Revisa el formulario! Algunos datos están mal")
+    } else if (this.currentFormIndex() === 1) {
+      const validCompaniesForm = this.isFormValid(this.companiesService.companiesForm())
+      const validOperationCentersForm = this.isFormValid(this.operationCentersService.operationCentersForm())
+      if (!validCompaniesForm) this.showMessage("¡Recuerda que debes seleccionar al menos una empresa!")
+      if (!validOperationCentersForm) this.showMessage("¡Recuerda que debes seleccionar al menos un centro de operaciones!")
+      formValid = validCompaniesForm && validOperationCentersForm
+    } else if (this.currentFormIndex() === 2) {
+      formValid = this.isFormValid(this.costCentersService.costCentersForm.getValue())
+      if (!formValid) this.showMessage("¡Recuerda que debes seleccionar al menos un centro de costo!")
+    } else if (this.currentFormIndex() === 3) {
+      formValid = this.isFormValid(this.storesService.storesForm())
+      if (!formValid) this.showMessage("¡Debes seleccionar al menos una bodega!")
+    } else if (this.currentFormIndex() === 4) {
+      formValid = this.isFormValid(this.otherAppsService.otherAppsForm())
+      if (!formValid) this.showMessage("¡Hay un error en el formulario de otras apps!")
+    } else if (this.currentFormIndex() === 5) {
+      formValid = this.isFormValid(this.applicantService.applicantForm())
+      if (!formValid) this.showMessage("¡Hay algún error en los datos de registro del responsable del formulario!")
+    } else {
+      formValid = true
+    }
 
-    return formValid
-  }
+    return formValid
+  }
 
-  isInFinalForm() {
-    return this.currentFormIndex() === this.tabsStatus.length - 1
-  }
+  isInFinalForm() {
+    return this.currentFormIndex() === this.tabsStatus.length - 1
+  }
 
-  nextPage() {
+  nextPage() {
+    // Si la validación del formulario actual es exitosa...
     if (this.isCurrentFormValid()) {
+      const nextIndex = this.currentFormIndex() + 1;
+      
+      // Si el usuario es técnico, salta a la última pestaña
       if (this.isTechnician) {
-        this.currentFormIndex.set(this.tabsStatus.length - 1)
-        this.tabsStatus = [true, false, false, false, false, true]
+        this.currentFormIndex.set(this.tabsStatus.length - 1);
+        this.tabsStatus = [true, ...new Array(this.tabsStatus.length - 2).fill(false), true];
       } else {
-        const nextIndex = this.currentFormIndex() + 1
-        this.currentFormIndex.set(nextIndex)
-        this.tabsStatus[nextIndex] = true
+        // Si no es técnico, avanza a la siguiente pestaña
+        this.currentFormIndex.set(nextIndex);
+        this.tabsStatus[nextIndex] = true;
+      }
+
+      // Deshabilitar la pestaña anterior para que no se pueda volver
+      const previousIndex = this.currentFormIndex() - 1;
+      if (previousIndex >= 0) {
+        this.tabsStatus[previousIndex] = false;
       }
     }
   }
 
-  getSelectedItems = (formValue: CheckBoxSet): string[] => Object.keys(formValue).filter(id => formValue[id])
+  getSelectedItems = (formValue: CheckBoxSet): string[] => Object.keys(formValue).filter(id => formValue[id])
 
-  getRequestData(): RegisterUserRequest {
-    const positionTypeData = this.positionTypeService.positionTypeForm().getRawValue()
-    return <RegisterUserRequest>{
-      basicData: this.basicDataFormService.basicDataForm.getRawValue(),
-      otherApps: this.otherAppsService.otherAppsForm().getRawValue(),
-      applicationData: this.applicantService.applicantForm().getRawValue(),
-      selectedCompanies: this.getSelectedItems(this.companiesService.companiesForm().getRawValue()),
-      selectedOperationCenters: this.getSelectedItems(this.operationCentersService.operationCentersForm().getRawValue()),
-      selectedPurchasingGroups: this.getSelectedItems(this.purchasingGroupsService.purchasingGroupsForm().getRawValue()),
-      selectedCostCenters: this.getSelectedItems(this.costCentersService.costCentersForm.getValue().getRawValue()),
-      selectedStores: this.getSelectedItems(this.storesService.storesForm().getRawValue()),
-      isTechnician: this.isTechnician,
-      isComercialAssessor: positionTypeData.positionType === "COMERCIAL ASSESSOR"
-    }
-  }
+  getRequestData(): RegisterUserRequest {
+    const positionTypeData = this.positionTypeService.positionTypeForm().getRawValue()
+    return <RegisterUserRequest>{
+      basicData: this.basicDataFormService.basicDataForm.getRawValue(),
+      otherApps: this.otherAppsService.otherAppsForm().getRawValue(),
+      applicationData: this.applicantService.applicantForm().getRawValue(),
+      selectedCompanies: this.getSelectedItems(this.companiesService.companiesForm().getRawValue()),
+      selectedOperationCenters: this.getSelectedItems(this.operationCentersService.operationCentersForm().getRawValue()),
+      selectedPurchasingGroups: this.getSelectedItems(this.purchasingGroupsService.purchasingGroupsForm().getRawValue()),
+      selectedCostCenters: this.getSelectedItems(this.costCentersService.costCentersForm.getValue().getRawValue()),
+      selectedStores: this.getSelectedItems(this.storesService.storesForm().getRawValue()),
+      isTechnician: this.isTechnician,
+      isComercialAssessor: positionTypeData.positionType === "COMERCIAL ASSESSOR"
+    }
+  }
 
-  resetForms(): void {
-    this.basicDataFormService.basicDataForm.reset()
-    this.companiesService.companiesForm().reset()
-    this.operationCentersService.operationCentersForm().reset()
-    this.costCentersService.costCentersForm.getValue().reset()
-    this.purchasingGroupsService.purchasingGroupsForm().reset()
-    this.storesService.storesForm().reset()
-    this.applicantService.applicantForm().reset()
-    this.positionTypeService.positionTypeForm().reset()
-    this.otherAppsService.otherAppsForm().reset()
-  }
+  resetForms(): void {
+    this.basicDataFormService.basicDataForm.reset()
+    this.companiesService.companiesForm().reset()
+    this.operationCentersService.operationCentersForm().reset()
+    this.costCentersService.costCentersForm.getValue().reset()
+    this.purchasingGroupsService.purchasingGroupsForm().reset()
+    this.storesService.storesForm().reset()
+    this.applicantService.applicantForm().reset()
+    this.positionTypeService.positionTypeForm().reset()
+    this.otherAppsService.otherAppsForm().reset()
+  }
 
-  onSuccessfulSubmit(r: EmptyResponse) {
-    this.registerRequestLoading = false
-    const dialogData = { message: r.description }
-    this.dialog.open(ConfirmationDialogComponent, { data: dialogData })
-    
-    // Reiniciar todos los formularios
-    this.resetForms()
-    
-    // Volver a la primera pestaña
-    this.currentFormIndex.set(0)
-    
-    // Reiniciar el estado de las pestañas
-    this.tabsStatus = [true, false, false, false, false, false]
-    
-    // Reiniciar el estado de la variable de técnico
-    this.isTechnician = false
-  }
+  onSuccessfulSubmit(r: EmptyResponse) {
+    this.registerRequestLoading = false
+    const dialogData = { message: r.description }
+    this.dialog.open(ConfirmationDialogComponent, { data: dialogData })
+    
+    // Reiniciar todos los formularios
+    this.resetForms()
+    
+    // Volver a la primera pestaña
+    this.currentFormIndex.set(0)
+    
+    // Reiniciar el estado de las pestañas
+    this.tabsStatus = [true, false, false, false, false, false]
+    
+    // Reiniciar el estado de la variable de técnico
+    this.isTechnician = false
+  }
 
-  requestUserRegistration() {
-    this.registerRequestLoading = true
-    this.equitelService.createUser(this.getRequestData()).subscribe({ next: this.onSuccessfulSubmit.bind(this) })
-  }
+  requestUserRegistration() {
+    this.registerRequestLoading = true
+    this.equitelService.createUser(this.getRequestData()).subscribe({ next: this.onSuccessfulSubmit.bind(this) })
+  }
 }
