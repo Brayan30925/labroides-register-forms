@@ -3,10 +3,8 @@
     <img ngSrc="assets/equitel-logo.png" width="302" height="48" priority alt="logo equitel" />
     <span>Solicitud de Usuario en Labroides</span>
   </mat-toolbar>
-
   <div class="mat-tab-group">
     <mat-tab-group [selectedIndex]="currentFormIndex()" mat-align-tabs="start" mat-stretch-tabs="false">
-      
       <mat-tab label="Datos Básicos" [disabled]="!tabsStatus[0]">
         <div class="mat-tab">
           <app-basic-data-form (technicianStatusChanged)="onTechnicianStatusChange($event)"></app-basic-data-form>
@@ -39,34 +37,22 @@
 
       <mat-tab label="Solicitante" [disabled]="!tabsStatus[5]">
         <div class="mat-tab">
-          <ng-container *ngIf="registerRequestLoading; else showResponsibleForm">
-            <mat-spinner></mat-spinner>
-          </ng-container>
-          <ng-template #showResponsibleForm>
-            <app-register-responsible-form></app-register-responsible-form>
-          </ng-template>
+          @if (registerRequestLoading) {
+          <mat-spinner></mat-spinner>
+          } @else {
+          <app-register-responsible-form></app-register-responsible-form>
+          }
         </div>
       </mat-tab>
-
     </mat-tab-group>
   </div>
 
   <div class="actions-container">
-    <button 
-      mat-flat-button 
-      color="primary"
-      *ngIf="!isInFinalForm()" 
-      (click)="nextPage()">
-      Siguiente
-    </button>
-
-    <button 
-      mat-flat-button 
-      color="primary"
-      *ngIf="isInFinalForm()" 
-      (click)="requestUserRegistration()"
-      [disabled]="masterForm.invalid">
-      Enviar
-    </button>
+    @if (isInFinalForm()) {
+    <button mat-flat-button (click)="requestUserRegistration()" color="primary"
+      [disabled]="applicantService.applicantForm().invalid">Enviar</button>
+    } @else {
+    <button mat-flat-button (click)="nextPage()" color="primary">Siguiente</button>
+    }
   </div>
 </div>
