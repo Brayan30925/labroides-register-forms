@@ -32,7 +32,13 @@ export class BasicDataFormService {
     email: this.formBuilder.control("", [
       Validators.required,
       Validators.email,
-      emailDomainValidator("@equitel.com.co")
+      emailDomainValidator([
+        "@equitel.com.co",
+        "@gmail.com",
+        "@hotmail.com",
+        "@outlook.com",
+        "@yahoo.com"
+      ])
     ]),
     isTechnician: this.formBuilder.control(false),
 
