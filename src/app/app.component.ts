@@ -54,7 +54,6 @@ export class AppComponent {
   tabsStatus: boolean[];
   isTechnician = false;
 
-  // Formulario maestro
   masterForm: FormGroup;
 
   constructor(
@@ -75,12 +74,13 @@ export class AppComponent {
     this.tabsStatus = [true, false, false, false, false, false];
     this.currentFormIndex = signal(0);
 
-    // Crear formulario maestro agrupando todos los subformularios
+    // Formulario maestro con todos los subformularios como FormGroup
     this.masterForm = this.fb.group({
       basicData: this.basicDataFormService.basicDataForm,
       companies: this.companiesService.companiesForm(),
       operationCenters: this.operationCentersService.operationCentersForm(),
-      costCenters: this.costCentersService.costCentersForm.getValue(),
+      // CORRECCIÓN: pasar el FormGroup directamente, no el valor
+      costCenters: this.costCentersService.costCentersForm,
       stores: this.storesService.storesForm(),
       purchasingGroups: this.purchasingGroupsService.purchasingGroupsForm(),
       otherApps: this.otherAppsService.otherAppsForm(),
@@ -97,14 +97,12 @@ export class AppComponent {
     this.snackBar.open(message, "OK", { duration: 4000 });
   }
 
-  // Validar cualquier formulario
   isFormValid(form: FormGroup) {
     form.updateValueAndValidity({ onlySelf: false });
     form.markAllAsTouched();
     return form.valid;
   }
 
-  // Validar formulario actual según la tab activa
   isCurrentFormValid(): boolean {
     const tabKeys = [
       "basicData",
@@ -176,7 +174,6 @@ export class AppComponent {
   }
 
   requestUserRegistration() {
-    // Validar todo el formulario maestro antes de enviar
     this.masterForm.updateValueAndValidity({ onlySelf: false });
     this.masterForm.markAllAsTouched();
 
