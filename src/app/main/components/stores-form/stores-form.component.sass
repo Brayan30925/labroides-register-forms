@@ -3,28 +3,46 @@
   flex-direction: column
   gap: 24px // Espacio vertical entre secciones
 
+  h2
+    color: #3f51b5 // Un color más profesional, como el primario de Material
+    margin-bottom: 16px
+
 .stores-list-grid
   display: grid
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) // Columnas flexibles
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) // Columnas flexibles y un poco más anchas
   gap: 16px // Espacio entre checkboxes
   padding: 20px
   border-radius: 8px
   background-color: #f9f9f9
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) // Sombra sutil
 
-  // Estilos para los checkboxes de Material para asegurar alineación
+  // Estilos mejorados para cada checkbox individual
   mat-checkbox
+    background-color: white
+    border: 1px solid #e0e0e0
+    border-radius: 8px
+    padding: 12px
     display: flex
-    align-items: center // Alinea el texto con el checkbox
-    padding: 8px 0 // Espacio interno para cada checkbox
+    align-items: center
+    transition: all 0.2s ease-in-out // Transición suave para el hover
+    cursor: pointer // Muestra el cursor de puntero
+
     .mat-mdc-checkbox-inner-container
-      margin-right: 8px // Espacio entre el checkbox y el texto
+      margin-right: 12px // Espacio más amplio entre el checkbox y el texto
+
+    // Efecto de hover para un look más interactivo
+    &:hover, &:focus
+      border-color: #3f51b5 // Borde con el color primario de Material
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
+      transform: translateY(-2px) // Ligero efecto de levantamiento
 
 // Media queries para ajustar el número de columnas en pantallas más pequeñas
 @media screen and (max-width: 768px)
   .stores-list-grid
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr))
     gap: 12px
+  .stores-form-container
+    padding: 15px
 
 @media screen and (max-width: 480px)
   .stores-list-grid
@@ -34,7 +52,7 @@
 .no-stores-message
   padding: 20px
   border-radius: 8px
-  background-color: #fff3e0 // Un color de fondo suave para mensajes
+  background-color: #fff3e0
   border: 1px solid #ffcc80
   color: #e65100
   text-align: center

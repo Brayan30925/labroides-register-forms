@@ -145,7 +145,7 @@
             <mat-option [value]="user.name">{{ user.name }}</mat-option>
           </ng-container>
         </mat-autocomplete>
-        <mat-hint>Selecciona al integrante que se reemplaza y/o con el mismo perfil</mat-hint>
+        <mat-hint>Ingresa el nombre de la persona que se reemplaza y/o con el mismo perfil</mat-hint>
         @if (formControls.previousUser.errors?.["required"]) {
           <mat-error>Debes seleccionar un integrante del sistema</mat-error>
         } @else if (formControls.previousUser.errors?.["whitespace"]) {

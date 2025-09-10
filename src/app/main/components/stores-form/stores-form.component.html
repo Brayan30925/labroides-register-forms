@@ -1,8 +1,6 @@
 @if (stores().length !== 0) {
   <form [formGroup]="storesForm()" class="stores-form-container">
-    <!-- ¡Se ha eliminado el checkbox general para seleccionar todas! -->
-
-    <!-- Checkboxes individuales -->
+    <h2>Bodegas a las que el usuario tendrá acceso</h2>
     <div class="stores-list-grid">
       <ng-container *ngFor="let store of stores(); index as i">
         <mat-checkbox [formControlName]="store.idStore">
