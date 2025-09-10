@@ -11,7 +11,7 @@ import {MatSelectChange, MatSelectModule} from "@angular/material/select"
 import {BasicDataFormService} from "../../services/forms/basic-data-form.service"
 import {MatInputModule} from "@angular/material/input"
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from "@angular/material/autocomplete"
-import {BehaviorSubject, Subscription, switchMap} from "rxjs"
+import {BehaviorSubject, Subscription, switchMap, of} from "rxjs"
 import {MatCheckboxModule} from '@angular/material/checkbox'
 import {Validators, AbstractControl} from "@angular/forms"
 import {MatSnackBar} from "@angular/material/snack-bar"
@@ -34,17 +34,15 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
     equitelServices: EquitelService = inject(EquitelService)
     basicDataForm: BasicDataFormGroup
 
-    operationCenters: OperationCenter[]
-    companies: Company[]
-    unitDeals: UnitDeal[]
-    costCenters: BehaviorSubject<CostCenter[]>
-    replacementUsers: LabroidesUser[]
-    replacementProfile: string
+    operationCenters: OperationCenter[] = []
+    companies: Company[] = []
+    unitDeals: UnitDeal[] = []
+    costCenters: BehaviorSubject<CostCenter[]> = new BehaviorSubject<CostCenter[]>([])
+    replacementUsers: LabroidesUser[] = []
+    replacementProfile: string = ""
 
     snackBar: MatSnackBar = inject(MatSnackBar)
-
     @Output() technicianStatusChanged = new EventEmitter<boolean>()
-
     private subscriptions = new Subscription()
 
     get formControls() {
@@ -53,12 +51,6 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
 
     constructor() {
         this.basicDataForm = this.formService.basicDataForm
-        this.costCenters = new BehaviorSubject(new Array<CostCenter>())
-        this.operationCenters = []
-        this.companies = []
-        this.unitDeals = []
-        this.replacementUsers = []
-        this.replacementProfile = ""
     }
 
     onUnitDealChange(event: MatSelectChange) {
@@ -69,10 +61,15 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
     }
 
     onReplacementSelection(event: MatAutocompleteSelectedEvent) {
-        if (event.option.value === undefined || event.option.value === null) return
-        const user = this.replacementUsers.find(u => u.name === event.option.value)
-        if (user === undefined) throw new Error("Hubo un error al seleccionar el usuario")
-        this.equitelServices.getProfileByUser(user.id).subscribe(p => this.formControls.profile.setValue(p.name))
+        if (event.option.value) {
+            const user = this.replacementUsers.find(u => u.name === event.option.value)
+            if (user) {
+                this.equitelServices.getProfileByUser(user.id).subscribe(p => this.formControls.profile.setValue(p.name))
+                this.formControls.previousUser.setErrors(null)
+            } else {
+                this.formControls.previousUser.setErrors({'notInList': true})
+            }
+        }
     }
 
     ngOnInit(): void {
@@ -97,7 +94,6 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
                 const profileControl = this.formControls.profile
 
                 if (isTechnician) {
-                    // Ocultar Usuario Anterior y pre-llenar Cargo y Perfil
                     previousUserControl.disable()
                     previousUserControl.clearValidators()
                     previousUserControl.setValue('')
@@ -109,37 +105,32 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
                     profileControl.setValue('TECNICO')
                     profileControl.disable()
                     profileControl.clearValidators()
-
+                   
                 } else {
-                    // Habilitar y re-aplicar validaciones
                     companyControl.enable()
-                    companyControl.setValidators(Validators.required)
+                    companyControl.setValidators([Validators.required])
 
                     operationCenterControl.enable()
-                    operationCenterControl.setValidators(Validators.required)
+                    operationCenterControl.setValidators([Validators.required])
 
                     unitDealControl.enable()
-                    unitDealControl.setValidators(Validators.required)
+                    unitDealControl.setValidators([Validators.required])
 
                     costCenterControl.enable()
-                    costCenterControl.setValidators(Validators.required)
+                    costCenterControl.setValidators([Validators.required])
 
-                    // Habilitar y limpiar campos específicos
                     positionControl.enable()
-                    // CORRECCIÓN: Agregamos el validador `pattern` para que no acepte solo espacios
-                   
+                    positionControl.setValidators([Validators.required, Validators.pattern(/^.*\S.*$/)])
                     positionControl.setValue('')
 
                     previousUserControl.enable()
-                    // CORRECCIÓN: Agregamos el validador `pattern` para que no acepte solo espacios
-                    
+                    previousUserControl.setValidators([Validators.required, Validators.pattern(/^.*\S.*$/)])
                     previousUserControl.setValue('')
 
                     profileControl.enable()
                     profileControl.setValue('')
                 }
 
-                // Actualizar el estado de validación de cada control
                 companyControl.updateValueAndValidity()
                 operationCenterControl.updateValueAndValidity()
                 unitDealControl.updateValueAndValidity()
@@ -163,7 +154,12 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
         })
 
         this.formControls.previousUser.valueChanges.pipe(
-            switchMap(value => this.equitelServices.getUsersByName(value))
+            switchMap(value => {
+                if (typeof value === 'string' && value.length >= 3) {
+                    return this.equitelServices.getUsersByName(value)
+                }
+                return of([])
+            })
         ).subscribe({next: u => (this.replacementUsers = u)})
 
         this.costCenters.subscribe({

@@ -1,14 +1,16 @@
 <form [formGroup]="basicDataForm">
   <h2>Datos personales del integrante</h2>
   <div class="form-section">
+    <!-- ... (otros campos personales sin cambios) ... -->
+
     <mat-form-field style="grid-row: 1; grid-column: 1">
       <mat-label>Documento de Identidad</mat-label>
       <input [formControl]="formControls.docId" matInput placeholder="11111111" />
       <mat-hint>Ingresa el documento de identidad</mat-hint>
       @if (formControls.docId.errors?.["required"]) {
-        <mat-error>Debes ingresar el documento de identidad</mat-error>
+      <mat-error>Debes ingresar el documento de identidad</mat-error>
       } @else if (formControls.docId.errors?.["pattern"]) {
-        <mat-error>El documento de identidad solo debe contener números</mat-error>
+      <mat-error>El documento de identidad solo debe contener números</mat-error>
       }
     </mat-form-field>
 
@@ -17,9 +19,9 @@
       <input [formControl]="formControls.name" matInput placeholder="Pepito Antonio" />
       <mat-hint>Ingresa los nombres</mat-hint>
       @if (formControls.name.errors?.["required"]) {
-        <mat-error>Debes ingresar los nombres</mat-error>
+      <mat-error>Debes ingresar los nombres</mat-error>
       } @else if (formControls.name.errors?.["whitespace"]) {
-        <mat-error>El nombre no puede estar vacío o contener solo espacios</mat-error>
+      <mat-error>El nombre no puede estar vacío o contener solo espacios</mat-error>
       }
     </mat-form-field>
 
@@ -28,9 +30,9 @@
       <input [formControl]="formControls.lastName" matInput placeholder="Perez Perez" />
       <mat-hint>Ingresa los apellidos</mat-hint>
       @if (formControls.lastName.errors?.["required"]) {
-        <mat-error>Debes ingresar los apellidos</mat-error>
+      <mat-error>Debes ingresar los apellidos</mat-error>
       } @else if (formControls.lastName.errors?.["whitespace"]) {
-        <mat-error>Los apellidos no pueden estar vacíos o contener solo espacios</mat-error>
+      <mat-error>Los apellidos no pueden estar vacíos o contener solo espacios</mat-error>
       }
     </mat-form-field>
 
@@ -39,13 +41,13 @@
       <input [formControl]="formControls.email" matInput placeholder="username@equitel.com.co" />
       <mat-hint>Ingresa el email</mat-hint>
       @if (formControls.email.errors?.["required"]) {
-        <mat-error>Debes ingresar el email</mat-error>
+      <mat-error>Debes ingresar el email</mat-error>
       } @else if (formControls.email.errors?.["email"]) {
-        <mat-error>El formato del email es inválido</mat-error>
+      <mat-error>El formato del email es inválido</mat-error>
       } @else if (formControls.email.errors?.["invalidDomain"]) {
-        <mat-error>El email ingresado no es valido</mat-error>
+      <mat-error>El email ingresado no es valido</mat-error>
       } @else if (formControls.email.errors?.["repeatedEmail"]) {
-        <mat-error>Ya existe un usuario con este email</mat-error>
+      <mat-error>Ya existe un usuario con este email</mat-error>
       }
     </mat-form-field>
 
@@ -54,19 +56,17 @@
       <input [formControl]="formControls.phoneNumber" matInput placeholder="3101010101" />
       <mat-hint>Ingresa el número telefónico</mat-hint>
       @if (formControls.phoneNumber.errors?.["required"]) {
-        <mat-error>Debes ingresar el número telefónico</mat-error>
+      <mat-error>Debes ingresar el número telefónico</mat-error>
       } @else if (formControls.phoneNumber.errors?.["pattern"]) {
-        <mat-error>El número telefónico solo puede contener números</mat-error>
+      <mat-error>El número telefónico solo puede contener números</mat-error>
       } @else if (formControls.phoneNumber.errors?.["minlength"]) {
-        <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
+      <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
       } @else if (formControls.phoneNumber.errors?.["maxlength"]) {
-        <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
+      <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
       }
     </mat-form-field>
 
-    <mat-checkbox 
-      class="is-technician-checkbox" 
-      [formControl]="formControls.isTechnician">
+    <mat-checkbox class="is-technician-checkbox" [formControl]="formControls.isTechnician">
       ¿Es técnico?
     </mat-checkbox>
   </div>
@@ -139,15 +139,20 @@
     <ng-container *ngIf="!formControls.isTechnician.value">
       <mat-form-field style="grid-row: 2; grid-column: 2">
         <mat-label>Usuario Anterior</mat-label>
-        <input [matAutocomplete]="replacement" [formControl]="formControls.previousUser" matInput placeholder="Pepito Perez" />
+        <input 
+          [matAutocomplete]="replacement" 
+          [formControl]="formControls.previousUser" 
+          matInput
+          placeholder="Escribe el nombre y selecciona una opción"
+        />
         <mat-autocomplete #replacement="matAutocomplete" (optionSelected)="onReplacementSelection($event)" autoActiveFirstOption="true">
           <ng-container *ngFor="let user of replacementUsers">
             <mat-option [value]="user.name">{{ user.name }}</mat-option>
           </ng-container>
         </mat-autocomplete>
-        <mat-hint>Ingresa el nombre de la persona que se reemplaza y/o con el mismo perfil</mat-hint>
+        <mat-hint>Ingresa al menos 3 letras para buscar</mat-hint>
         @if (formControls.previousUser.errors?.["required"]) {
-          <mat-error>Debes seleccionar un integrante del sistema</mat-error>
+          <mat-error>Debes seleccionar un usuario</mat-error>
         } @else if (formControls.previousUser.errors?.["whitespace"]) {
           <mat-error>El usuario anterior no puede estar vacío o contener solo espacios</mat-error>
         }
