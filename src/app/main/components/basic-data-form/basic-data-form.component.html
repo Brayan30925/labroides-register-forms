@@ -1,68 +1,76 @@
 <form [formGroup]="basicDataForm">
   <h2>Datos personales del integrante</h2>
   <div class="form-section">
-    <!-- ... (otros campos personales sin cambios) ... -->
-
+    <!-- Documento de Identidad -->
     <mat-form-field style="grid-row: 1; grid-column: 1">
       <mat-label>Documento de Identidad</mat-label>
       <input [formControl]="formControls.docId" matInput placeholder="11111111" />
       <mat-hint>Ingresa el documento de identidad</mat-hint>
-      @if (formControls.docId.errors?.["required"]) {
-      <mat-error>Debes ingresar el documento de identidad</mat-error>
-      } @else if (formControls.docId.errors?.["pattern"]) {
-      <mat-error>El documento de identidad solo debe contener números</mat-error>
+
+      @if (formControls.docId.hasError('required') && formControls.docId.touched) {
+        <mat-error>Debes ingresar el documento de identidad</mat-error>
+      } @else if (formControls.docId.hasError('pattern') && formControls.docId.touched) {
+        <mat-error>El documento de identidad solo debe contener números</mat-error>
       }
     </mat-form-field>
 
+    <!-- Nombres -->
     <mat-form-field style="grid-row: 1; grid-column: 2">
       <mat-label>Nombres</mat-label>
       <input [formControl]="formControls.name" matInput placeholder="Pepito Antonio" />
       <mat-hint>Ingresa los nombres</mat-hint>
-      @if (formControls.name.errors?.["required"]) {
-      <mat-error>Debes ingresar los nombres</mat-error>
-      } @else if (formControls.name.errors?.["whitespace"]) {
-      <mat-error>El nombre no puede estar vacío o contener solo espacios</mat-error>
+
+      @if (formControls.name.hasError('required') && formControls.name.touched) {
+        <mat-error>Debes ingresar los nombres</mat-error>
+      } @else if (formControls.name.hasError('whitespace') && formControls.name.touched) {
+        <mat-error>El nombre no puede estar vacío o contener solo espacios</mat-error>
       }
     </mat-form-field>
 
+    <!-- Apellidos -->
     <mat-form-field style="grid-row: 1; grid-column: 3">
       <mat-label>Apellidos</mat-label>
       <input [formControl]="formControls.lastName" matInput placeholder="Perez Perez" />
       <mat-hint>Ingresa los apellidos</mat-hint>
-      @if (formControls.lastName.errors?.["required"]) {
-      <mat-error>Debes ingresar los apellidos</mat-error>
-      } @else if (formControls.lastName.errors?.["whitespace"]) {
-      <mat-error>Los apellidos no pueden estar vacíos o contener solo espacios</mat-error>
+
+      @if (formControls.lastName.hasError('required') && formControls.lastName.touched) {
+        <mat-error>Debes ingresar los apellidos</mat-error>
+      } @else if (formControls.lastName.hasError('whitespace') && formControls.lastName.touched) {
+        <mat-error>Los apellidos no pueden estar vacíos o contener solo espacios</mat-error>
       }
     </mat-form-field>
 
+    <!-- Email -->
     <mat-form-field style="grid-row: 2; grid-column: 1">
       <mat-label>Email</mat-label>
       <input [formControl]="formControls.email" matInput placeholder="username@equitel.com.co" />
       <mat-hint>Ingresa el email</mat-hint>
-      @if (formControls.email.errors?.["required"]) {
-      <mat-error>Debes ingresar el email</mat-error>
-      } @else if (formControls.email.errors?.["email"]) {
-      <mat-error>El formato del email es inválido</mat-error>
-      } @else if (formControls.email.errors?.["invalidDomain"]) {
-      <mat-error>El email ingresado no es valido</mat-error>
-      } @else if (formControls.email.errors?.["repeatedEmail"]) {
-      <mat-error>Ya existe un usuario con este email</mat-error>
+
+      @if (formControls.email.hasError('required') && formControls.email.touched) {
+        <mat-error>Debes ingresar el email</mat-error>
+      } @else if (formControls.email.hasError('email') && formControls.email.touched) {
+        <mat-error>El formato del email es inválido</mat-error>
+      } @else if (formControls.email.hasError('invalidDomain') && formControls.email.touched) {
+        <mat-error>El email ingresado no es valido</mat-error>
+      } @else if (formControls.email.hasError('repeatedEmail') && formControls.email.touched) {
+        <mat-error>Ya existe un usuario con este email</mat-error>
       }
     </mat-form-field>
 
+    <!-- Celular -->
     <mat-form-field style="grid-row: 2; grid-column: 2">
       <mat-label>Celular</mat-label>
       <input [formControl]="formControls.phoneNumber" matInput placeholder="3101010101" />
       <mat-hint>Ingresa el número telefónico</mat-hint>
-      @if (formControls.phoneNumber.errors?.["required"]) {
-      <mat-error>Debes ingresar el número telefónico</mat-error>
-      } @else if (formControls.phoneNumber.errors?.["pattern"]) {
-      <mat-error>El número telefónico solo puede contener números</mat-error>
-      } @else if (formControls.phoneNumber.errors?.["minlength"]) {
-      <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
-      } @else if (formControls.phoneNumber.errors?.["maxlength"]) {
-      <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
+
+      @if (formControls.phoneNumber.hasError('required') && formControls.phoneNumber.touched) {
+        <mat-error>Debes ingresar el número telefónico</mat-error>
+      } @else if (formControls.phoneNumber.hasError('pattern') && formControls.phoneNumber.touched) {
+        <mat-error>El número telefónico solo puede contener números</mat-error>
+      } @else if (formControls.phoneNumber.hasError('minlength') && formControls.phoneNumber.touched) {
+        <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
+      } @else if (formControls.phoneNumber.hasError('maxlength') && formControls.phoneNumber.touched) {
+        <mat-error>El número telefónico debe tener 10 caracteres</mat-error>
       }
     </mat-form-field>
 
@@ -70,7 +78,7 @@
       ¿Es técnico?
     </mat-checkbox>
   </div>
-
+  
   <h2>Datos laborales del integrante</h2>
   <div class="form-section">
     <mat-form-field style="grid-row: 1; grid-column: 1">

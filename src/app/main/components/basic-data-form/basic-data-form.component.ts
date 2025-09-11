@@ -13,190 +13,209 @@ import {MatInputModule} from "@angular/material/input"
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from "@angular/material/autocomplete"
 import {BehaviorSubject, Subscription, switchMap, of} from "rxjs"
 import {MatCheckboxModule} from '@angular/material/checkbox'
-import {Validators, AbstractControl, ValidatorFn, ValidationErrors} from "@angular/forms" // Importa ValidatorFn y ValidationErrors
+import {Validators, AbstractControl, ValidatorFn, ValidationErrors} from "@angular/forms"
 import {MatSnackBar} from "@angular/material/snack-bar"
 
 @Component({
-    selector: "app-basic-data-form",
-    standalone: true, // Agregado para que sea un componente standalone
-    templateUrl: "./basic-data-form.component.html",
-    styleUrl: "./basic-data-form.component.sass",
-    imports: [
-        SharedModule,
-        MatInputModule,
-        MatSelectModule,
-        MatAutocompleteModule,
-        MatCheckboxModule
-    ]
+    selector: "app-basic-data-form",
+    standalone: true,
+    templateUrl: "./basic-data-form.component.html",
+    styleUrl: "./basic-data-form.component.sass",
+    imports: [
+        SharedModule,
+        MatInputModule,
+        MatSelectModule,
+        MatAutocompleteModule,
+        MatCheckboxModule
+    ]
 })
 export class BasicDataFormComponent implements OnInit, OnDestroy {
-    formService: BasicDataFormService = inject(BasicDataFormService)
-    equitelServices: EquitelService = inject(EquitelService)
-    basicDataForm: BasicDataFormGroup
+    formService: BasicDataFormService = inject(BasicDataFormService)
+    equitelServices: EquitelService = inject(EquitelService)
+    basicDataForm: BasicDataFormGroup
 
-    operationCenters: OperationCenter[] = []
-    companies: Company[] = []
-    unitDeals: UnitDeal[] = []
-    costCenters: BehaviorSubject<CostCenter[]> = new BehaviorSubject<CostCenter[]>([])
-    replacementUsers: LabroidesUser[] = []
-    replacementProfile: string = ""
+    operationCenters: OperationCenter[] = []
+    companies: Company[] = []
+    unitDeals: UnitDeal[] = []
+    costCenters: BehaviorSubject<CostCenter[]> = new BehaviorSubject<CostCenter[]>([])
+    replacementUsers: LabroidesUser[] = []
+    replacementProfile: string = ""
 
-    snackBar: MatSnackBar = inject(MatSnackBar)
-    @Output() technicianStatusChanged = new EventEmitter<boolean>()
-    private subscriptions = new Subscription()
+    snackBar: MatSnackBar = inject(MatSnackBar)
+    @Output() technicianStatusChanged = new EventEmitter<boolean>()
+    private subscriptions = new Subscription()
 
-    get formControls() {
-        return this.basicDataForm.controls
-    }
+    get formControls() {
+        return this.basicDataForm.controls
+    }
 
-    constructor() {
-        this.basicDataForm = this.formService.basicDataForm
-    }
+    constructor() {
+        this.basicDataForm = this.formService.basicDataForm
+    }
 
-    // Nuevo validador personalizado para el autocompletado
+    // ✅ Validador personalizado: solo acepta un objeto válido de la lista
     private previousUserValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
-            if (!control.value) {
-                return null; // El validador `required` ya maneja el campo vacío
+            const value = control.value;
+            if (!value) return null; // required lo maneja otro validador
+
+            // Si es un objeto con id válido, verificar que exista en la lista
+            if (typeof value === "object" && value.id) {
+                const exists = this.replacementUsers.some(u => u.id === value.id);
+                return exists ? null : { notInList: true };
             }
-            // Verificar si el valor del control existe en la lista de usuarios.
-            const isSelectedFromList = this.replacementUsers.some(user => user.name === control.value);
-            return isSelectedFromList ? null : { 'notInList': true };
+
+            // Si es texto libre -> inválido
+            return { notInList: true };
         };
     }
 
-    onUnitDealChange(event: MatSelectChange) {
-        this.equitelServices.getCostCentersByUnitDeal(event.value).subscribe({
-            next: costCenters => this.costCenters.next(costCenters),
-            error: () => this.costCenters.next([])
-        })
-    }
+    // ✅ Selección de usuario: asigna el objeto completo
+   onReplacementSelection(event: MatAutocompleteSelectedEvent) {
+  const selectedName = event.option.value as string;
 
-    onReplacementSelection(event: MatAutocompleteSelectedEvent) {
-        if (event.option.value) {
-            const user = this.replacementUsers.find(u => u.name === event.option.value)
-            if (user) {
-                this.equitelServices.getProfileByUser(user.id).subscribe(p => this.formControls.profile.setValue(p.name))
-                // CORRECCIÓN: Al seleccionar un usuario, marcamos el control como válido
-                this.formControls.previousUser.setErrors(null)
-            } else {
-                // Si el valor no coincide con un usuario de la lista, forzamos un error
-                this.formControls.previousUser.setErrors({'notInList': true})
-            }
-        }
-    }
+  // Buscar el usuario real en la lista con ese nombre
+  const user = this.replacementUsers.find(u => u.name === selectedName);
 
-    ngOnInit(): void {
-        this.subscriptions.add(
-            this.formControls.isTechnician.valueChanges.subscribe(isTechnician => {
-                if (isTechnician && !this.personalDataFormIsValid()) {
-                    this.snackBar.open("Por favor, completa primero los datos personales.", "Cerrar", {
-                        duration: 4000,
-                    })
-                    this.formControls.isTechnician.setValue(false, {emitEvent: false})
-                    return
-                }
+  if (user) {
+    // Guardamos solo el nombre en el FormControl (string)
+    this.formControls.previousUser.setValue(user.name);
 
-                this.technicianStatusChanged.emit(isTechnician)
+    // Pedimos el perfil al backend usando el id
+    this.equitelServices.getProfileByUser(user.id)
+      .subscribe(p => this.formControls.profile.setValue(p.name));
 
-                const companyControl = this.formControls.company
-                const operationCenterControl = this.formControls.operationCenter
-                const unitDealControl = this.formControls.unitDeal
-                const costCenterControl = this.formControls.costCenter
-                const positionControl = this.formControls.position
-                const previousUserControl = this.formControls.previousUser
-                const profileControl = this.formControls.profile
+    // Marcar como válido
+    this.formControls.previousUser.setErrors(null);
+  } else {
+    // Si no lo encuentra en la lista, forzamos error
+    this.formControls.previousUser.setErrors({ notInList: true });
+  }
+}
 
-                if (isTechnician) {
-                    previousUserControl.disable()
-                    previousUserControl.clearValidators()
-                    previousUserControl.setValue('')
 
-                    positionControl.setValue('TECNICO')
-                    positionControl.disable()
-                    positionControl.clearValidators()
+    // ✅ Mostrar nombre aunque el valor sea objeto
+    displayUser(user?: LabroidesUser): string {
+        return user ? user.name : "";
+    }
 
-                    profileControl.setValue('TECNICO')
-                    profileControl.disable()
-                    profileControl.clearValidators()
+    onUnitDealChange(event: MatSelectChange) {
+        this.equitelServices.getCostCentersByUnitDeal(event.value).subscribe({
+            next: costCenters => this.costCenters.next(costCenters),
+            error: () => this.costCenters.next([])
+        })
+    }
 
-                } else {
-                    companyControl.enable()
-                    companyControl.setValidators([Validators.required])
+    ngOnInit(): void {
+        this.subscriptions.add(
+            this.formControls.isTechnician.valueChanges.subscribe(isTechnician => {
+                if (isTechnician && !this.personalDataFormIsValid()) {
+                    this.snackBar.open("Por favor, completa primero los datos personales.", "Cerrar", {
+                        duration: 4000,
+                    })
+                    this.formControls.isTechnician.setValue(false, {emitEvent: false})
+                    return
+                }
 
-                    operationCenterControl.enable()
-                    operationCenterControl.setValidators([Validators.required])
+                this.technicianStatusChanged.emit(isTechnician)
 
-                    unitDealControl.enable()
-                    unitDealControl.setValidators([Validators.required])
+                const companyControl = this.formControls.company
+                const operationCenterControl = this.formControls.operationCenter
+                const unitDealControl = this.formControls.unitDeal
+                const costCenterControl = this.formControls.costCenter
+                const positionControl = this.formControls.position
+                const previousUserControl = this.formControls.previousUser
+                const profileControl = this.formControls.profile
 
-                    costCenterControl.enable()
-                    costCenterControl.setValidators([Validators.required])
+                if (isTechnician) {
+                    previousUserControl.disable()
+                    previousUserControl.clearValidators()
+                    previousUserControl.setValue("")
 
-                    positionControl.enable()
-                    positionControl.setValidators([Validators.required, Validators.pattern(/^.*\S.*$/)])
-                    positionControl.setValue('')
+                    positionControl.setValue("TECNICO")
+                    positionControl.disable()
+                    positionControl.clearValidators()
 
-                    previousUserControl.enable()
-                    // !!! CORRECCIÓN: Se aplica el validador personalizado !!!
-                    previousUserControl.setValidators([Validators.required, this.previousUserValidator()])
-                    previousUserControl.setValue('')
+                    profileControl.setValue("TECNICO")
+                    profileControl.disable()
+                    profileControl.clearValidators()
 
-                    profileControl.enable()
-                    profileControl.setValue('')
-                }
+                } else {
+                    companyControl.enable()
+                    companyControl.setValidators([Validators.required])
 
-                companyControl.updateValueAndValidity()
-                operationCenterControl.updateValueAndValidity()
-                unitDealControl.updateValueAndValidity()
-                costCenterControl.updateValueAndValidity()
-                positionControl.updateValueAndValidity()
-                previousUserControl.updateValueAndValidity()
-                profileControl.updateValueAndValidity()
-            })
-        )
+                    operationCenterControl.enable()
+                    operationCenterControl.setValidators([Validators.required])
 
-        this.equitelServices.getAllOperationCenters().subscribe({
-            next: oc => (this.operationCenters = oc)
-        })
+                    unitDealControl.enable()
+                    unitDealControl.setValidators([Validators.required])
 
-        this.equitelServices.getAllCompanies().subscribe({
-            next: c => (this.companies = c)
-        })
+                    costCenterControl.enable()
+                    costCenterControl.setValidators([Validators.required])
 
-        this.equitelServices.getAllUnitDeals().subscribe({
-            next: ud => (this.unitDeals = ud)
-        })
+                    positionControl.enable()
+                    positionControl.setValidators([Validators.required, Validators.pattern(/^.*\S.*$/)])
+                    positionControl.setValue("")
 
-        this.formControls.previousUser.valueChanges.pipe(
-            switchMap(value => {
-                if (typeof value === 'string' && value.length >= 3) {
-                    return this.equitelServices.getUsersByName(value)
-                }
-                return of([])
-            })
-        ).subscribe({next: u => (this.replacementUsers = u)})
+                    previousUserControl.enable()
+                    previousUserControl.setValidators([Validators.required, this.previousUserValidator()])
+                    previousUserControl.setValue("")
 
-        this.costCenters.subscribe({
-            next: values => {
-                if (values.length === 0) this.formControls.costCenter.disable()
-                else this.formControls.costCenter.enable()
-            }
-        })
-    }
+                    profileControl.enable()
+                    profileControl.setValue("")
+                }
 
-    private personalDataFormIsValid(): boolean {
-        const personalDataControls = ['docId', 'name', 'lastName', 'email', 'phoneNumber']
-        const formControls = this.basicDataForm.controls as unknown as { [key: string]: AbstractControl | null }
+                companyControl.updateValueAndValidity()
+                operationCenterControl.updateValueAndValidity()
+                unitDealControl.updateValueAndValidity()
+                costCenterControl.updateValueAndValidity()
+                positionControl.updateValueAndValidity()
+                previousUserControl.updateValueAndValidity()
+                profileControl.updateValueAndValidity()
+            })
+        )
 
-        personalDataControls.forEach(controlName => {
-            formControls[controlName]?.markAsTouched()
-        })
+        this.equitelServices.getAllOperationCenters().subscribe({
+            next: oc => (this.operationCenters = oc)
+        })
 
-        return personalDataControls.every(controlName => formControls[controlName]?.valid)
-    }
+        this.equitelServices.getAllCompanies().subscribe({
+            next: c => (this.companies = c)
+        })
 
-    ngOnDestroy(): void {
-        this.subscriptions.unsubscribe()
-    }
+        this.equitelServices.getAllUnitDeals().subscribe({
+            next: ud => (this.unitDeals = ud)
+        })
+
+        this.formControls.previousUser.valueChanges.pipe(
+            switchMap(value => {
+                if (typeof value === "string" && value.length >= 3) {
+                    return this.equitelServices.getUsersByName(value)
+                }
+                return of([])
+            })
+        ).subscribe({next: u => (this.replacementUsers = u)})
+
+        this.costCenters.subscribe({
+            next: values => {
+                if (values.length === 0) this.formControls.costCenter.disable()
+                else this.formControls.costCenter.enable()
+            }
+        })
+    }
+
+    private personalDataFormIsValid(): boolean {
+        const personalDataControls = ["docId", "name", "lastName", "email", "phoneNumber"]
+        const formControls = this.basicDataForm.controls as unknown as { [key: string]: AbstractControl | null }
+
+        personalDataControls.forEach(controlName => {
+            formControls[controlName]?.markAsTouched()
+        })
+
+        return personalDataControls.every(controlName => formControls[controlName]?.valid)
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe()
+    }
 }
