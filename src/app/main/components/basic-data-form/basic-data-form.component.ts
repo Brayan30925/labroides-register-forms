@@ -53,45 +53,35 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
         this.basicDataForm = this.formService.basicDataForm
     }
 
-    // ✅ Validador personalizado: solo acepta un objeto válido de la lista
-    private previousUserValidator(): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value;
-            if (!value) return null; // required lo maneja otro validador
-
-            // Si es un objeto con id válido, verificar que exista en la lista
-            if (typeof value === "object" && value.id) {
-                const exists = this.replacementUsers.some(u => u.id === value.id);
-                return exists ? null : { notInList: true };
-            }
-
-            // Si es texto libre -> inválido
-            return { notInList: true };
-        };
+// Validador para asegurar que el valor escrito está en la lista
+private previousUserValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) {
+      return null; // El required ya se encarga de vacíos
     }
+    const isValid = this.replacementUsers.some(user => user.name === control.value);
+    return isValid ? null : { notInList: true };
+  };
+}
 
-    // ✅ Selección de usuario: asigna el objeto completo
-   onReplacementSelection(event: MatAutocompleteSelectedEvent) {
+onReplacementSelection(event: MatAutocompleteSelectedEvent) {
   const selectedName = event.option.value as string;
-
-  // Buscar el usuario real en la lista con ese nombre
   const user = this.replacementUsers.find(u => u.name === selectedName);
 
   if (user) {
-    // Guardamos solo el nombre en el FormControl (string)
+    // Guardar solo el nombre
     this.formControls.previousUser.setValue(user.name);
 
-    // Pedimos el perfil al backend usando el id
+    // Traer perfil por id
     this.equitelServices.getProfileByUser(user.id)
       .subscribe(p => this.formControls.profile.setValue(p.name));
 
-    // Marcar como válido
-    this.formControls.previousUser.setErrors(null);
+    this.formControls.previousUser.setErrors(null); // válido
   } else {
-    // Si no lo encuentra en la lista, forzamos error
     this.formControls.previousUser.setErrors({ notInList: true });
   }
 }
+
 
 
     // ✅ Mostrar nombre aunque el valor sea objeto
