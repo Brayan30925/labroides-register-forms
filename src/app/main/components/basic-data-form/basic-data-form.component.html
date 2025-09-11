@@ -78,7 +78,7 @@
       ¿Es técnico?
     </mat-checkbox>
   </div>
-  
+
   <h2>Datos laborales del integrante</h2>
   <div class="form-section">
     <mat-form-field style="grid-row: 1; grid-column: 1">
@@ -145,26 +145,28 @@
     </ng-container>
 
     <ng-container *ngIf="!formControls.isTechnician.value">
-      <mat-form-field style="grid-row: 2; grid-column: 2">
-        <mat-label>Usuario Anterior</mat-label>
-        <input 
-          [matAutocomplete]="replacement" 
-          [formControl]="formControls.previousUser" 
-          matInput
-          placeholder="Escribe el nombre y selecciona una opción"
-        />
-        <mat-autocomplete #replacement="matAutocomplete" (optionSelected)="onReplacementSelection($event)" autoActiveFirstOption="true">
-          <ng-container *ngFor="let user of replacementUsers">
-            <mat-option [value]="user.name">{{ user.name }}</mat-option>
-          </ng-container>
-        </mat-autocomplete>
-        <mat-hint>Ingresa al menos 3 letras para buscar</mat-hint>
-        @if (formControls.previousUser.errors?.["required"]) {
-          <mat-error>Debes seleccionar un usuario</mat-error>
-        } @else if (formControls.previousUser.errors?.["whitespace"]) {
-          <mat-error>El usuario anterior no puede estar vacío o contener solo espacios</mat-error>
-        }
-      </mat-form-field>
+     <mat-form-field style="grid-row: 2; grid-column: 2">
+  <mat-label>Usuario Anterior</mat-label>
+  <input
+    [matAutocomplete]="replacement"
+    [formControl]="formControls.previousUser"
+    matInput
+    placeholder="Escribe el nombre y selecciona una opción"
+  />
+  <mat-autocomplete #replacement="matAutocomplete" (optionSelected)="onReplacementSelection($event)" autoActiveFirstOption="true">
+    <ng-container *ngFor="let user of replacementUsers">
+      <mat-option [value]="user.name">{{ user.name }}</mat-option>
+    </ng-container>
+  </mat-autocomplete>
+  <mat-hint>Ingresa al menos 3 letras para buscar</mat-hint>
+
+  @if (formControls.previousUser.errors?.["required"]) {
+    <mat-error>Debes seleccionar un usuario</mat-error>
+  } @else if (formControls.previousUser.errors?.["notInList"]) {
+    <mat-error>Debes seleccionar un usuario válido de la lista</mat-error>
+  }
+</mat-form-field>
+
     </ng-container>
 
     <ng-container *ngIf="!formControls.isTechnician.value">
