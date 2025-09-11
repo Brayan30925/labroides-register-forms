@@ -13,7 +13,7 @@ import {MatInputModule} from "@angular/material/input"
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from "@angular/material/autocomplete"
 import {BehaviorSubject, Subscription, switchMap, of} from "rxjs"
 import {MatCheckboxModule} from '@angular/material/checkbox'
-import {Validators, AbstractControl} from "@angular/forms"
+import {Validators, AbstractControl, ValidatorFn, ValidationErrors} from "@angular/forms" // Importa ValidatorFn y ValidationErrors
 import {MatSnackBar} from "@angular/material/snack-bar"
 
 @Component({
@@ -53,6 +53,18 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
         this.basicDataForm = this.formService.basicDataForm
     }
 
+    // Nuevo validador personalizado para el autocompletado
+    private previousUserValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            if (!control.value) {
+                return null; // El validador `required` ya maneja el campo vacío
+            }
+            // Verificar si el valor del control existe en la lista de usuarios.
+            const isSelectedFromList = this.replacementUsers.some(user => user.name === control.value);
+            return isSelectedFromList ? null : { 'notInList': true };
+        };
+    }
+
     onUnitDealChange(event: MatSelectChange) {
         this.equitelServices.getCostCentersByUnitDeal(event.value).subscribe({
             next: costCenters => this.costCenters.next(costCenters),
@@ -65,8 +77,10 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
             const user = this.replacementUsers.find(u => u.name === event.option.value)
             if (user) {
                 this.equitelServices.getProfileByUser(user.id).subscribe(p => this.formControls.profile.setValue(p.name))
+                // CORRECCIÓN: Al seleccionar un usuario, marcamos el control como válido
                 this.formControls.previousUser.setErrors(null)
             } else {
+                // Si el valor no coincide con un usuario de la lista, forzamos un error
                 this.formControls.previousUser.setErrors({'notInList': true})
             }
         }
@@ -105,7 +119,7 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
                     profileControl.setValue('TECNICO')
                     profileControl.disable()
                     profileControl.clearValidators()
-                   
+
                 } else {
                     companyControl.enable()
                     companyControl.setValidators([Validators.required])
@@ -124,7 +138,8 @@ export class BasicDataFormComponent implements OnInit, OnDestroy {
                     positionControl.setValue('')
 
                     previousUserControl.enable()
-                    previousUserControl.setValidators([Validators.required, Validators.pattern(/^.*\S.*$/)])
+                    // !!! CORRECCIÓN: Se aplica el validador personalizado !!!
+                    previousUserControl.setValidators([Validators.required, this.previousUserValidator()])
                     previousUserControl.setValue('')
 
                     profileControl.enable()
